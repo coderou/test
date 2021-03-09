@@ -211,11 +211,89 @@
   /* eslint-disable-next-line */
 15.Swiper功能和自定义移入移出暂停
   😅tip:swiper的实例名称不能叫myswiper,而要是swiper
-  caroucel:旋转木马
+  tip:caroucel:旋转木马
   #Caroucel/index.vue
   {
-    
+    <template>
+      <div
+        @mouseenter="this.swiper[0].autoplay.stop()"
+        @mouseleave="swiper[0].autoplay.start()"
+      >
+      .....
+      </div>
+    </template>
+    <script>
+      import Swiper from 'swiper';
+      import 'swiper/css/swiper.min.css'
+      export default{
+        data(){
+          return {
+            swiper:null,
+          }
+        },
+        mounted(){
+          this.swiper=new Swiper('.swiper-container',{
+            navigation: {
+              nextEl: '.swiper-button-next',
+              prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+              el: '.swiper-pagination',
+            },
+            loop: true,
+            autoplay: {
+              delay: 1000,
+              // stopOnLastSlide: false, // 最后一张不停止自动轮播
+              // disableOnInteraction: true, // 鼠标移入时停止自动轮播
+            },
+          })
+        }
+      }
+    </script>
   }
-
+  #main.js
+  {
+    import Carousel from './components/Carousel';
+    Vue.component('Carousel',Carousel)
+  }
+  #views/Home/ListContainer
+  {
+    <template>
+      <Carousel/>
+    </template>
+  }
 16.mock:模拟,mockjs:一个模拟api接口的库
-  #api/
+  #mock/banners.json
+  {
+    数据
+  }
+  #mock/index.js
+  {
+    import Mock from 'mockjs';
+    import banners from './banners.json'
+
+    Mock.mock('/mock/banners',{
+      code:200,
+      data:banners,
+    })
+  }
+  #main.js
+  {
+    import './mock/index.js'
+  }
+  #api/mockRequest
+  {
+    同request.js
+    改baseURL:'/mock'
+  }
+  #api/index.js
+  {
+    import Mock from './mockRequest';
+
+    export const reqGetBanners=()=>
+    mockRequest({
+      method:'GET',
+      url:'/banners'
+    })
+  }
+17.

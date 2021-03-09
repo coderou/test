@@ -22,7 +22,7 @@ const errorMessages = {
 };
 
 const request = axios.create({
-  baseURL: '/api', // 🤣🤣🤣/ 就是当前服务器地址(代理服务器)
+  baseURL: '/mock', // 🤣🤣🤣/ 就是当前服务器地址(代理服务器)
   timeout: 100000,
 });
 
