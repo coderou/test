@@ -21,6 +21,7 @@
             </h3>
             <div class="item-list clearfix">
               <div class="subitem">
+                <!-- 二级菜单 -->
                 <dl
                   v-for="dt in item.categoryChild"
                   :key="dt.categoryId"
@@ -29,6 +30,7 @@
                   <dt>
                     <a href="">{{ dt.categoryName }}</a>
                   </dt>
+                  <!-- 三级菜单 -->
                   <dd>
                     <em v-for="dd in dt.categoryChild" :key="dd.categoryId">
                       <a href="">{{ dd.categoryName }}</a>
@@ -45,7 +47,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
+import { getBaseCategoryList } from '../../api/index';
 
 export default {
   name: 'TypeNav',
@@ -55,13 +58,21 @@ export default {
     };
   },
   mounted() {
-    axios({
+    /* axios({
       url: 'http://182.92.128.115/api/product/getBaseCategoryList',
       method: 'get',
     }).then((res) => {
       this.data = res.data.data;
       console.log(this.data);
-    });
+    }); */
+    getBaseCategoryList()
+      .then((res) => {
+        this.data = res;
+        console.log(res);
+      })
+      .catch((message) => {
+        console.log(message);
+      });
   },
 };
 </script>
@@ -178,6 +189,7 @@ export default {
           }
 
           &:hover {
+            background-color: greenyellow;
             .item-list {
               display: block;
             }

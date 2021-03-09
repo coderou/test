@@ -1,6 +1,3 @@
-/* eslint-disable prefer-promise-reject-errors */
-/* eslint-disable no-lonely-if */
-/* eslint-disable no-else-return */
 /*
   封装axios:
     1.设置请求地址前缀和超事件
@@ -56,15 +53,14 @@ request.interceptors.response.use(
     // 如果没有回来-->断网,请求超市
     if (error.response) {
       return Promise.reject(errorMessages[error.response.status]);
-    } else {
-      if (error.message.indexOf('Network Error') !== -1) {
-        return Promise.reject('网络连接失败.请链接网络或打开wifi重试');
-      } else if (error.message.indexOf('timeout') !== -1) {
-        return Promise.reject('网速太慢了,请链接wifi重试');
-      }
     }
-
-    return Promise.reject('未知错误,请联系管理员解决');
+    if (error.message.indexOf('Network Error') !== -1) {
+      return Promise.reject(new Error('网络连接失败.请链接网络或打开wifi重试'));
+    }
+    if (error.message.indexOf('timeout') !== -1) {
+      return Promise.reject(new Error('网速太慢了,请链接wifi重试'));
+    }
+    return Promise.reject(new Error('未知错误,请联系管理员解决'));
   },
 );
 
