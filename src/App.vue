@@ -1,32 +1,38 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+  <div>
+    <Header />
+    <!-- 显示路由组件 -->
+    <router-view></router-view>
+
+    <!-- 登录和注册页面不显示Footer组件 -->
+    <!-- <Footer v-if="isShowFooter" /> -->
+    <Footer v-if="!$route.meta.isHideFooter" />
   </div>
 </template>
 
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script type="text/ecmascript-6">
+// eslint-disable-next-line import/extensions
+// import { reqBaseCategoryList } from '@/api';
+import Footer from './components/Footer/Footer.vue';
+import Header from './components/Header/Header.vue';
 
-#nav {
-  padding: 30px;
+export default {
+  name: 'App',
+  computed: {
+    isShowFooter() {
+      const { path } = this.$route.path;
+      return path !== '/login' && path !== '/register';
+    },
+  },
+  components: {
+    Footer,
+    Header,
+  },
+  async mounted() {
+    // const result = await reqBaseCategoryList();
+    // console.log('result', result);
+  },
+};
+</script>
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+<style lang="less" scoped></style>

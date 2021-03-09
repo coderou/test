@@ -1,7 +1,8 @@
 .DS_Store
 node_modules
 /dist
-
+ANOTES
+A代码
 
 # local env files
 .env.local
