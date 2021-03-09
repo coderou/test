@@ -43,7 +43,11 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "import/extensions": 0,
+      "import/no-unresolved": 0,
+      "quotes": 0
+    }
   },
   "browserslist": [
     "> 1%",
