@@ -60,6 +60,7 @@
 38.editorconfig->insert_final_newline = true->因为有些特定平台最后一行没有就会抱错
 😉39.拉取对应分支:
   git fetch origin xionjian:xionjian
+  错误,应该是git clone -b xiongjian xx地址
 40.git关联操作坑
   git 关联远程仓库操作:
     git remote add origin git@gitee.com:coderou/test.git
@@ -75,4 +76,3 @@
 45.配置eslint忽略单引号博爱错
   "import/extensions": 0,
   "quotes": 0
-
