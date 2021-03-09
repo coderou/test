@@ -11,7 +11,7 @@ export const reqBaseCategoryList = () => {
   ajax.get('/product/getBaseCategoryList');
 };
 
-export function getBaseCategoryList() {
+export function reqGetBaseCategoryList() {
   return request({
     method: 'GET',
     url: '/product/getBaseCategoryList',

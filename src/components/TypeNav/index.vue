@@ -15,7 +15,11 @@
       </nav>
       <div class="sort">
         <div class="all-sort-list2">
-          <div v-for="item in data" :key="item.categoryId" class="item bo">
+          <div
+            v-for="item in categoryList"
+            :key="item.categoryId"
+            class="item bo"
+          >
             <h3>
               <a href="">{{ item.categoryName }}</a>
             </h3>
@@ -48,16 +52,25 @@
 
 <script>
 // import axios from 'axios';
-import { getBaseCategoryList } from '../../api/index';
+import { mapState, mapActions } from 'vuex';
+// import { getBaseCategoryList } from '../../api/index';
 
 export default {
   name: 'TypeNav',
   data() {
     return {
-      data: [],
+      // data: [],
     };
   },
+  computed: {
+    // ...mapState(['categoryList']), //映射数据:不行,之前的做法,现在不行了
+    // ...mapState(['home']),// 可以用,但是太麻烦
+    ...mapState({
+      categoryList: (state) => state.home.categoryList, // 在使用的时候会调用这个函数,形参是state所有数据
+    }),
+  },
   mounted() {
+    // 1.0_直接axios发送
     /* axios({
       url: 'http://182.92.128.115/api/product/getBaseCategoryList',
       method: 'get',
@@ -65,14 +78,20 @@ export default {
       this.data = res.data.data;
       console.log(this.data);
     }); */
-    getBaseCategoryList()
+    // 1.2_拦截器改造
+    /* getBaseCategoryList()
       .then((res) => {
         this.data = res;
         console.log(res);
       })
       .catch((message) => {
         console.log(message);
-      });
+      }); */
+    // 2.0通过vuex映射
+    this.getBaseCategoryList(); // 映射方法:可以
+  },
+  methods: {
+    ...mapActions(['getBaseCategoryList']),
   },
 };
 </script>

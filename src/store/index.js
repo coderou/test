@@ -12,3 +12,23 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   modules, // 配置store的所有模块
 });
+
+/*
+  // 定义modules
+  modules:{
+    home:{
+      state:{},
+      actions:{},
+      getters:{}.
+      mutations:{},
+    },
+    login:{...},
+  }
+  // 最终vuex管理的状态的数据结构:
+  {
+    home:{
+      categoryList:[]
+    },
+    login,
+  }
+*/
