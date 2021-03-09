@@ -1,7 +1,7 @@
 1.前端路由是不需要刷新的,注意表单会默认提交表单,记得取消默认行为
 2.一般来说,当前组件用的资源一般都是放在当前组件内,比如图片
 3.alt+1,2快速切换vsc的视图
-4.使用module配合vuex配合axios实现获取数据,...map
+😋4.使用module配合vuex配合axios实现获取数据,...map
   #TypeNav.vue
   {
     import {mapState,mapAction} from 'vuex';
@@ -17,7 +17,7 @@
       getBaseCategoryList()
     }
   }
-5.vuex的module基本用法:
+😋5.vuex的module基本用法:
   #store/index.js
   {
     import Vue from 'vue';
@@ -63,4 +63,147 @@
     }
 
   }
-6.
+😋6.axios配置中间件:
+  #api/request.js
+  {
+    import axios from 'axios';
+    import NProgress from 'nprogress';
+    import 'nprogress/nprogress.css';
+
+    const errorMessage={
+      401: '未授权',
+      403: '进制访问',
+      404: '资源找不到,请检查地址',
+      500: '服务器错误',
+    };
+
+    const request = axios.create({
+      baseURL:'/api',
+      timeout:100000,
+    })
+
+    request.interceptors.request.use((config)=>{
+      NProgress.start();
+      return config;
+    })
+
+    request.interceptors.response.use((response)=>{
+      NProgress.done();
+      if(response.data.code===200){return response.data.data;}
+      return Promise.reject(response.data.message || '未知错误');
+    },(error)=>{
+      NProgress.done();
+      if(error.response){return Promise.reject(errorMessage[error.response.status])};
+      if (error.message.indexOf('Network Error') !== -1) {return Promise.reject(new Error('网络连接失败.请链接网络或打开wifi重试'))}
+      if (error.message.indexOf('timeout') !== -1) {return Promise.reject(new Error('网速太慢了,请链接wifi重试'))}
+      return Promise.reject(new Error('未知错误,请联系管理员解决'));
+    })
+
+    export default request;
+  }
+  #vue.config.js
+  {
+    devServer:{
+      proxy:{
+        '^/api':{
+          target:'http://182.92.128.115',
+          changeOrigin:true
+        }
+      }
+    }
+  }
+7.pretter是格式化js文件的,vuetur是格式化vue文件的
+8.prettierrc格式化文件设置
+  tip:有时候配置了小耗子的格式化,默认设置更改就不会生效,需要单独配置一个
+  #.prettierrc
+  {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "singleQuote": true,
+    "semi": true,
+    "arrowParens": "always",
+    "trailingComma": "all"
+  }
+9.面试题:优化性能:当设计三级导航的时候,如果使用router-link直接跳转,会导致vue绑定多个router-link数据,数据层变得臃肿
+  优化方式1:不直接使用router-link,改为编程式导航,为每一个a链接绑定点击事件,并且传递参数,进行跳转
+    缺点:事件绑定过多
+  优化方式2:配合事件委托,只绑定一次事件,将需要的a链接自身的信息,通过dataset自定义标签绑定在DOM上面
+    既解决了绑定事件过多,又解决了router-link的问题
+10.三级导航跳转方式1(router-link直接跳转):
+  #TypeNav.vue
+  {
+    <template>
+      ...
+      <router-link :to="{
+        name:'Search',
+        query:{
+          categoryName:item.categoryName,
+          category1ID:item.categoryId // 1级导航:category1ID  2级导航:category2ID
+        }
+      }">
+        {{c1.categoryName}}
+      </router-link>
+    </template>
+  }
+11.三级跳转方式2(编程时导航跳转):
+  #TypeNav.cue
+  {
+    <template>
+      ...
+      <a @click.prevent="toSearch(c1.categoryName, c2.categoryId, 'category1ID')">
+        {{c1.categoryName}}
+      </a>
+    </template>
+    <script>
+      export default{
+        method:{
+          toSearch(categoryName,categoryId,level){
+            this.$router.push({
+              name:'Search',
+              query:{
+                categoryName,
+                [level]:categoryId,
+              }
+            })
+          }
+        }
+      }
+    </script>
+  }
+12.三级跳转方式3(配合冒泡\H5自定义属性的编程式导航):
+  #TypeNav.cue
+  {
+    <template>
+      .....
+      <div class="" @click.prevent="toSearch">
+        .....
+        <a
+          :data-categoryName="item.categoryName"
+          :data-categoryId="item.categoryId"
+          data-level="category1Id"
+        >
+        {{ item.categoryName }}
+        </a>
+        .....
+      </div>
+    </template>
+    <script>
+      export default{
+        method:{
+          toSearch(e){
+            // 😋注意:dataset中的都是小写
+            const { categoryname, categoryid, level } = event.target.dataset;
+            if (!categoryname) return;
+            this.$router.push({
+              name:'Search',
+              query:{
+                categoryName,
+                [level]:categoryId,
+              }
+            })
+          }
+        }
+      }
+    </script>
+  }
+13.

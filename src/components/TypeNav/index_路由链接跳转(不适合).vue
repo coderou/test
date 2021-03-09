@@ -14,40 +14,22 @@
         <a href="###">秒杀</a>
       </nav>
       <div class="sort">
-        <div class="all-sort-list2" @click.prevent="toSearch">
+        <div class="all-sort-list2">
           <div
             v-for="item in categoryList"
             :key="item.categoryId"
             class="item bo"
           >
             <h3>
-              <!--
-                1.使用路由链接跳转
-                  问题:生成的router-link太多了
-                  :to="{
-                    name:"Search", // 跳转到那个命名路由
-                    query:{
-                      categoryName:item.categoryName,
-                      category1ID:item.categoryId
-                    },
-                  }"
-                2.使用编程式导航
-                    <a
-                      @click.prevent="
-                        toSearch(c1.categoryName, c2.categoryId, 'category1ID')
-                      "
-                      href=""
-                      >{{ dt.categoryName }}</a
-                    >
-                  问题:click事件绑定太多了
-                3.使用事件委托来优化
-               -->
-              <a
-                :data-categoryName="item.categoryName"
-                :data-categoryId="item.categoryId"
-                data-level="category1Id"
-                >{{ item.categoryName }}</a
-              >
+              <router-link
+              :to="{
+                name:"Search", // 跳转到那个命名路由
+                query:{
+                  categoryName:item.categoryName,
+                  category1ID:item.categoryId
+                },
+              }"
+              href="">{{ item.categoryName }}</router-link>
             </h3>
             <div class="item-list clearfix">
               <div class="subitem">
@@ -58,22 +40,26 @@
                   class="fore"
                 >
                   <dt>
-                    <a
-                      :data-categoryName="dt.categoryName"
-                      :data-categoryId="dt.categoryId"
-                      data-level="category2Id"
-                      >{{ dt.categoryName }}</a
-                    >
+                    <router-link
+                    :to="{
+                name:"Search", // 跳转到那个命名路由
+                query:{
+                  categoryName:dt.categoryName,
+                  category2ID:dt.categoryId
+                },
+              }" href="">{{ dt.categoryName }}</router-link>
                   </dt>
                   <!-- 三级菜单 -->
                   <dd>
                     <em v-for="dd in dt.categoryChild" :key="dd.categoryId">
-                      <a
-                        :data-categoryName="dd.categoryName"
-                        :data-categoryId="dd.categoryId"
-                        data-level="category3Id"
-                        >{{ dd.categoryName }}</a
-                      >
+                      <router-link
+                      :to="{
+                name:"Search", // 跳转到那个命名路由
+                query:{
+                  categoryName:dd.categoryName,
+                  category3ID:dd.categoryId
+                },
+              }" href="">{{ dd.categoryName }}</router-link>
                     </em>
                   </dd>
                 </dl>
@@ -128,28 +114,6 @@ export default {
   },
   methods: {
     ...mapActions(['getBaseCategoryList']),
-    /* toSearch(categoryName, categoryId, level) {
-      this.$router.history.push({
-        name: 'Search',
-        query: {
-          categoryName,
-          [level]: categoryId,
-        },
-      });
-    }, */
-    toSearch(event) {
-      // console.log(event.target.dataset); // 注意:dataset中的都是小写
-      const { categoryname, categoryid, level } = event.target.dataset;
-      if (!categoryname) return;
-
-      this.$router.history.push({
-        name: 'Search',
-        query: {
-          categoryName: categoryname,
-          [level]: categoryid,
-        },
-      });
-    },
   },
 };
 </script>
