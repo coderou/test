@@ -206,4 +206,16 @@
       }
     </script>
   }
-13.
+13.轮播图:Caroucel
+14.只禁止一行eslint生效
+  /* eslint-disable-next-line */
+15.Swiper功能和自定义移入移出暂停
+  😅tip:swiper的实例名称不能叫myswiper,而要是swiper
+  caroucel:旋转木马
+  #Caroucel/index.vue
+  {
+    
+  }
+
+16.mock:模拟,mockjs:一个模拟api接口的库
+  #api/
