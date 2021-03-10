@@ -127,24 +127,68 @@ import SearchSelector from './SearchSelector/SearchSelector';
 
 export default {
   name: 'Search',
+  data() {
+    const {
+      category1Id,
+      category2Id,
+      category3Id,
+      categoryName,
+    } = this.$route.query;
+    const { keyword } = this.$route.params;
+    return {
+      // 搜索条件
+      options: {
+        category1Id,
+        category2Id,
+        category3Id,
+        categoryName,
+        keyword,
+        order: '',
+        pageNo: 1,
+        pageSize: 10,
+        props: [],
+        trademark: '',
+      },
+    };
+  },
 
   components: {
     SearchSelector,
   },
   computed: {
-    ...mapGetters([
-      'goodsList',
-      'total',
-      'pageSize',
-      'pageNo',
-      'totalPages',
-    ]),
+    ...mapGetters(['goodsList']),
   },
   methods: {
     ...mapActions(['getGoodsList']),
+    search(newOptions = {}) {
+      // category1Id=undefined不影响搜索
+      /*
+        如果是在当前页面更新params参数,参数不会立即更新,所以需要手动传过来
+        有值就用,没有值就不用
+      */
+      const options = {
+        ...this.options,
+        ...newOptions,
+      };
+      this.options = options;
+      this.options = this.getGoodsList(options);
+    },
   },
+  watch: {
+    $route: {
+      handler(newVal) {
+        this.search({
+          ...newVal.query,
+          ...newVal.params,
+        });
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
+
   mounted() {
-    this.getGoodsList({});
+    // this.search()
   },
 };
 </script>

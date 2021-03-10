@@ -472,4 +472,112 @@
       }
     </script>
   }
-25.
+25.更新params的数据是异步的
+😂😂26.实现页面跳转数据自动更新
+  #components/Header/Header.vue
+  {
+    export default{
+      .....
+      methods:{
+        toSearch() {
+          const { keyword } = this;
+          const { query } = this.$route;
+          const location = { name: 'Search' };
+          if (keyword) {
+            location.params = { keyword };
+          }
+          if (query.categoryName) {
+            location.query = query;
+          }
+          this.$router.history.push(location);
+        },
+      },
+      .....
+    }
+  }
+  #components/TypeNav/index.vue
+  {
+    export default{
+      methods:{
+        toSearch(event){
+          const{category,categoryid,level}=e.target.dataset;
+          if(!categoryname) return;
+          const location = {name:'Search',};
+          // 处理query参数
+          const query = {
+            categoryname:categoryname,
+            [level]:categoryid,
+          };
+          location.query=query;
+          // 处理params参数
+          const {keyword}=this.$route.params;
+          if(keyword){
+            location.params={keyword}
+          }
+          //通知search组件请求数据
+          this.$router.history.push(location)
+        },
+      },
+    };
+  }
+  #/views/Search/Search.vue
+  {
+    export default{
+      data(){
+        const {
+          category1Id,
+          category2Id,
+          category3Id,
+          categoryName,
+        }=this.$route.query;
+        const {keyword}=this.$route.params;
+        return {
+          // 搜索条件
+          options:{
+            category1Id,
+            category2Id,
+            category3Id,
+            categoryName,
+            keyword,
+            order: '',
+            pageNo: 1,
+            pageSize: 10,
+            props: [],
+            trademark: '',
+          },
+        };
+      },
+      computed:{
+        ...mapGetters(['goodsList']),
+      },
+      methods:{
+        ...mapActions(['getGoodsList']),
+        search(newOptions={}){
+          // category1Id=undefined 不影响搜索结果
+          // 如果在当前页面更新params参数,参数不会立即更新,所以需要手动传递过来,有值就用,没有就是undefined
+          const options={
+            ...this.options,
+            ...newOptions,
+          };
+          this.options=options;
+          this.options=this.getGoodsList(options);
+        },
+      },
+      watch:{
+        $route:{
+          handler(newVal){
+            this.search({
+              ...newVal.params,
+              ...newVal.query,
+            });
+          },
+          deep:true,
+          immediate:true,
+        },
+      },
+      mounted(){}
+    };
+  }
+27.今天的有点难,主要是逻辑板比较乱
+28.如果自己写不出来,至少保证能看懂代码,能更加代码写出自己的理解
+29.

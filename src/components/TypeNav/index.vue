@@ -145,14 +145,24 @@ export default {
       // console.log(event.target.dataset); // 注意:dataset中的都是小写
       const { categoryname, categoryid, level } = event.target.dataset;
       if (!categoryname) return;
-
-      this.$router.history.push({
+      const location = {
         name: 'Search',
-        query: {
-          categoryName: categoryname,
-          [level]: categoryid,
-        },
-      });
+      };
+      // 处理query参数
+      const query = {
+        categoryName: categoryname,
+        [level]: categoryid,
+      };
+      location.query = query;
+      // 处理params参数
+      const { keyword } = this.$route.params;
+      if (keyword) {
+        location.params = { keyword };
+      }
+
+      // 通知search组件请求数据
+      // this.$bus.$emit('search', { query });
+      this.$router.history.push(location);
     },
   },
 };

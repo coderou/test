@@ -72,10 +72,17 @@ export default {
     }, */
     toSearch() {
       const { keyword } = this;
+      const { query } = this.$route;
+
       const location = { name: 'Search' };
-      if (this.keyword) {
+      if (keyword) {
         location.params = { keyword };
       }
+      if (query.categoryName) {
+        location.query = query;
+      }
+
+      // this.$bus.$emit('search', { keyword });
       this.$router.history.push(location);
     },
   },
