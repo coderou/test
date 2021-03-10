@@ -10,8 +10,8 @@ export default {
     return state.search.searchList.attrsList;
   },
   // 商品数据
-  goodList(state) {
-    return state.search.searchList.goodList;
+  goodsList(state) {
+    return state.search.searchList.goodsList;
   },
   // 商品总数
   total(state) {

@@ -99,12 +99,30 @@
     </script>
   }
 12.watch监视carousel数据->拿到数据->watcher方法触发->DOM节点更新完成->this.$nextTick()触发->new Swiper
-🍟🍟13.🍟🍟开发遇到问题/开发经验:swiper实例参数1用css选择器,就是3个,换$ref之后,就是一个
+🍟13.面试题:开发遇到问题/开发经验:swiper实例参数1用css选择器,就是3个,换$ref之后,就是一个
   所以之前的3个其实就是页面一共有3个轮播图
   面试可以说!!
   遇到了同一个页面使用多个swiper的时候,出现swiper实例是一个数组,这里涉及到知识点,如果new Swiper(参数1,{配置对象})的参数1是css选择器,就会选择页面上所有符合要求的元素,导致出现3个
   ,而使用ref技术之后,参数1直接传递真实DOM,会因为this.$refs.xxx的this不同,而不会再互相干扰,同时mouseleave和mouseenter事件也不在需要[0]进行选择
-  ,另一个问题是当使用vuex传递给使用Carousel多个实例的时候,因为经过了中间层传递,出现
+  ,另一个问题是当使用vuex传递给使用Carousel多个实例的时候,因为经过了中间层传递,出现了当<Carousel v-for="..."/>组件被渲染的时候,需要v-for的里面有数据
+  ,而v-for里面有数据了,Carousel里面也有数据了,即:watch一开始监视到的carouselList已经是有数据的,不会再发生变化,不会触发
+  ,解决:使用watch的对象写法:
+    {
+      watch:{
+        carouselList: {
+          handler(newVal) {
+            if (!newVal.length) return; // 为了banners第一次不要newSwiper
+            this.$nextTick(() => {
+              this.swiper = new Swiper(this.$refs.swiper, {
+                .....
+              });
+              console.log(this.swiper);
+            });
+          },
+          immediate: true,
+        },
+      },
+    }
 14.生成指定大小的图片的工具
 15.1floors没有数据,不会生成Floor,有数据,那么carouseList也会有数据,所有watch不会监视到数据变化
 16.实现同一页面多个轮播图
@@ -225,7 +243,7 @@
 19.如果传递的值是要改变的,不能定义在meta中
 20.在v-if或者v-show中,直接赋值true比 a=!a性能好,因为后者会额外经过一次getter,前面不会
 21.分别暴露直接引入是没有东西的
-22.搜索结果页面&显示隐藏&vuex获取数据&使用getter映射vuex的数据&
+🍟22.搜索结果页面&显示隐藏&vuex获取数据&使用getter映射vuex的数据&
   #api/index.js
   {
     export const reqGetGoodsList = (data) =>
@@ -350,8 +368,8 @@
       attrsList(state) {
         return state.search.searchList.attrsList;
       },
-      goodList(state) {
-        return state.search.searchList.goodList;
+      goodsList(state) {
+        return state.search.searchList.goodsList;
       },
       total(state) {
         return state.search.searchList.total;
@@ -405,3 +423,53 @@
   }
 23.params只要写了就必须传递参数,不能是undefined!!!,否则会跳转不过去
   tip:routes的path加问号表示可选,{path:'Search/:keyword?'}
+24.展示vuex数据
+  #views/Search/Search.vue
+  {
+    <ul class="fl sui-tag">
+      <li class="with-x" v-show="$route.query.categoryName">
+        {{ $route.query.categoryName }}~~~
+      </li>
+      <li class="with-x" v-show="$route.params.keyword">
+        {{ $route.params.keyword }}~~~
+      </li>
+    </ul>
+    .....
+    <div class="goods-list">
+      <ul>
+        <li class="yui3-u-1-5" v-for="goods in goodsList" :key="goods.id">
+        .....
+      </ul>
+    </div>
+  }
+  #views/Search/SearchSelector/SearchSelector.vue
+  {
+    <template>
+      <ul class="logo-list">
+        <li v-for="trademark in trademarkList" :key="trademark.tmId">
+          {{ trademark.tmName }}
+        </li>
+      </ul>
+      .....
+      <div class="type-wrap" v-for="(attrs, index) in attrsList" :key="index">
+        <div class="fl key">{{ attrs.attrName }}</div>
+        <div class="fl value">
+          <ul class="type-list">
+            <li v-for="attr in attrs.attrValueList" :key="attr.attrId">
+              <a>{{ attr }}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="fl ext"></div>
+      </div>
+    </template>
+    <script>
+      import {mapGetters} from 'vuex';
+      export default{
+        computed:{
+          ...mapGetters(['trademarkList', 'attrsList']),
+        },
+      }
+    </script>
+  }
+25.
