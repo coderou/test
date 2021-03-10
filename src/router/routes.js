@@ -30,7 +30,8 @@ export default [
     component: Home,
   },
   {
-    path: '/search/:keyword?', // params参数可传可不传
+    // 使用params必须要路由路径配置
+    path: '/search/:keyword?/', // params参数可传可不传,如果不加问号,表示必填
     name: 'Search',
     component: Search,
   },

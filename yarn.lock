@@ -3246,7 +3246,7 @@ dom-serializer@0:
     domelementtype "^2.0.1"
     entities "^2.0.0"
 
-dom7@^2.1.5:
+dom7@^2.1.3:
   version "2.1.5"
   resolved "https://registry.npm.taobao.org/dom7/download/dom7-2.1.5.tgz#a79411017800b31d8400070cdaebbfc92c1f6377"
   integrity sha1-p5QRAXgAsx2EAAcM2uu/ySwfY3c=
@@ -7700,6 +7700,11 @@ sshpk@^1.7.0:
     safer-buffer "^2.0.2"
     tweetnacl "~0.14.0"
 
+ssr-window@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npm.taobao.org/ssr-window/download/ssr-window-1.0.1.tgz?cache=0&sync_timestamp=1604919636199&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fssr-window%2Fdownload%2Fssr-window-1.0.1.tgz#30752a6a4666e7767f0b7e6aa6fc2fdbd0d9b369"
+  integrity sha1-MHUqakZm53Z/C35qpvwv29DZs2k=
+
 ssr-window@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npm.taobao.org/ssr-window/download/ssr-window-2.0.0.tgz?cache=0&sync_timestamp=1604919636199&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fssr-window%2Fdownload%2Fssr-window-2.0.0.tgz#98c301aef99523317f8d69618f0010791096efc4"
@@ -7943,13 +7948,13 @@ svgo@^1.0.0:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
-swiper@5:
-  version "5.4.5"
-  resolved "https://registry.npm.taobao.org/swiper/download/swiper-5.4.5.tgz#a350f654bf68426dbb651793824925512d223c0f"
-  integrity sha1-o1D2VL9oQm27ZReTgkklUS0iPA8=
+swiper@5.3.8:
+  version "5.3.8"
+  resolved "https://registry.npm.taobao.org/swiper/download/swiper-5.3.8.tgz#25c555d73787d35aa56418b904cb3ed4423bade8"
+  integrity sha1-JcVV1zeH01qlZBi5BMs+1EI7reg=
   dependencies:
-    dom7 "^2.1.5"
-    ssr-window "^2.0.0"
+    dom7 "^2.1.3"
+    ssr-window "^1.0.1"
 
 table@^5.2.3:
   version "5.4.6"

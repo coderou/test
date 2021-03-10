@@ -99,4 +99,123 @@
     </script>
   }
 12.watch监视carousel数据->拿到数据->watcher方法触发->DOM节点更新完成->this.$nextTick()触发->new Swiper
-13.
+🍟🍟13.🍟🍟开发遇到问题/开发经验:swiper实例参数1用css选择器,就是3个,换$ref之后,就是一个
+  所以之前的3个其实就是页面一共有3个轮播图
+  面试可以说!!
+14.生成指定大小的图片的工具
+15.1floors没有数据,不会生成Floor,有数据,那么carouseList也会有数据,所有watch不会监视到数据变化
+16.实现同一页面多个轮播图
+  tip:
+  #mock/floors.json
+  {
+    data
+  }
+  #mock/index.js
+  {
+    import floors from './floors.json';
+    Mock.mock('/mock/floors','get',{
+      code:200,
+      data:floors
+    })
+  }
+  #store/modules/home.js
+  {
+    import {reqGetFloors} from '@/api';
+    const state={
+      floor:[],
+    }
+    const actions={
+      getFloor({commit}){
+        reqGetFloors()
+        .then((floors)=>{
+          commit('GET_FLOORS',floors);
+        })
+        .catch((message)=>{
+          console.log(message)
+        })
+      }
+    }
+    const mutations={
+      GET_FLOORS(state,floors){
+        state.floors=floors
+      }
+    }
+  }
+  #views/Home/Home.vue
+  {
+    <template>
+      <Floor v-for="floor in floors" :key="floor.id" :floor="floor" />
+    </template>
+    <script>
+      import {mapState,mapActions} from 'vuex';
+      export default{
+        computed:{
+          ...mapState({
+            floors:(state)=>state.home.floors
+          })
+        },
+        methods:{
+          ...mapActions(['getFloor'])
+        },
+        mounted(){
+          this.getFloor()
+        },
+      }
+    </script>
+  }
+  #views/Home/Floor/Floor.vue
+  {
+    <template>
+      <h3 class="fl">{{ floor.name }}</h3>
+      .....
+        <li v-for="(nav,index) in floor.navList" :key="index">
+          <a></a>
+        </li>
+      .....
+        <li v-for="(keyword, index) in floor.keywords" :key="index">
+          {{ keyword }}
+        </li>
+        <img :src="floor.imgUrl" />
+        <div class="floorBanner">
+          <Carousel :carouselList="floor.carouselList" />
+        </div>
+      .....
+    </template>
+    <script>
+      export default{
+        props:['floor'],
+      }
+    </script>
+  }
+  🍕#components/Carousel/index.vue
+  {
+    export default {
+      watch:{
+        carouselList:{
+            handler(newVal) {
+            if (!newVal.length) return; // 为了banners第一次不要newSwiper
+            this.$nextTick(() => {
+              this.swiper = new Swiper(this.$refs.swiper, {
+                navigation: {
+                  nextEl: '.swiper-button-next',
+                  prevEl: '.swiper-button-prev',
+                },
+                pagination: {
+                  el: '.swiper-pagination',
+                },
+                loop: true,
+                autoplay: {
+                  delay: 1000,
+                },
+              });
+              console.log(this.swiper);
+            });
+          },
+          immediate: true,
+        }
+      }
+    }
+  }
+17.搜索
+  #Header
+18.params必须和路由配合:要加上/:keyword

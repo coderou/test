@@ -5,10 +5,16 @@ import TypeNav from '@/components/TypeNav/index.vue';
 import App from '@/App.vue';
 import router from '@/router';
 import store from '@/store';
-// 加载mock,让其生效
-import '@/mock';
+/* eslint-enable */
 
 import '@/assets/css/reset.css';
+// 加载mock,让其生效
+
+/* eslint-disable */
+if (process.env.NODE_ENV === 'development') {
+  require('./mock');
+  // import '@/mock';
+}
 
 Vue.config.productionTip = false;
 // 注册全局组件

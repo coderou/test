@@ -61,7 +61,13 @@ export default {
 
   methods: {
     toSearch() {
-      this.$router.history.push(`/search/${this.keyword}`);
+      // `/search/${this.keyword}`
+      this.$router.history.push({
+        name: 'Search',
+        params: {
+          keyword: this.keyword,
+        },
+      });
     },
   },
 };
