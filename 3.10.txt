@@ -8,7 +8,7 @@
 8.swiper6支持的是vue3,
 9.使用mock的时候如果不知道数据结构什么样子,可以问后端,但是最好自己能写,起名字要有意义
 10.swiper想要真正生效,必须先有DOM元素,而这时候banners一开始是空数组,先渲染的carousel,再拿的数据,导致图片不显示且swiper单页
-11.swiper配合mock拿图片
+🍟11.swiper配合mock拿图片
   tip:new Swiper必须必须必须在DOM生成之后再执行
   tip:this.$nextTick():vue实例的方法,等待DOM元素挂载完毕之后,执行内部代码,且执行一次
   tip:vue更新数据更新DOM是异步的,在MVVM中,是同步的,在源码中,会将cb放入回调队列执行
@@ -487,7 +487,7 @@
             location.params = { keyword };
           }
           if (query.categoryName) {
-            location.query = query;
+            location.query = query;//如果原本有query参数了,当用户使用搜索按钮筛选,保持query的状态
           }
           this.$router.history.push(location);
         },
@@ -509,7 +509,7 @@
             [level]:categoryid,
           };
           location.query=query;
-          // 处理params参数
+          // 处理params参数(本来只需要处理query,但是可能用户在Search组件点击三级导航,为了params参数不消失,处理一下)
           const {keyword}=this.$route.params;
           if(keyword){
             location.params={keyword}

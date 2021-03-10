@@ -146,15 +146,16 @@ export default {
       const { categoryname, categoryid, level } = event.target.dataset;
       if (!categoryname) return;
       const location = {
+        // 创建一个基本的location对象用于跳转,其实原理类似components/Header/Header.vue的跳转
         name: 'Search',
       };
-      // 处理query参数
+      // 处理query参数(本来是只需要处理query就可以了,但是考虑到Search点击三级导航的情况,需要处理params参数)
       const query = {
         categoryName: categoryname,
         [level]: categoryid,
       };
       location.query = query;
-      // 处理params参数
+      // 处理params参数(原本params可能就有参数,这里将原本的参数拿下来,当在Search页面点击三级导航,不会导致原来的params失去)
       const { keyword } = this.$route.params;
       if (keyword) {
         location.params = { keyword };

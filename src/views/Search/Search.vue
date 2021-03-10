@@ -133,11 +133,12 @@ export default {
       category2Id,
       category3Id,
       categoryName,
-    } = this.$route.query;
-    const { keyword } = this.$route.params;
+    } = this.$route.query; // 解构当前query中的参数
+    const { keyword } = this.$route.params; // 解构params参数
     return {
       // 搜索条件
       options: {
+        // 定义options保存params的数据和query的数据,以及其他筛选条件的数据,当数据变化,就会刷新页面
         category1Id,
         category2Id,
         category3Id,
@@ -156,34 +157,57 @@ export default {
     SearchSelector,
   },
   computed: {
-    ...mapGetters(['goodsList']),
+    ...mapGetters(['goodsList']), // getters拿到goodsList进行渲染
   },
   methods: {
-    ...mapActions(['getGoodsList']),
+    ...mapActions(['getGoodsList']), // 映射拿数据的方法
     search(newOptions = {}) {
+      // 定义一个search方法,默认传递参数对象
       // category1Id=undefined不影响搜索
       /*
         如果是在当前页面更新params参数,参数不会立即更新,所以需要手动传过来
         有值就用,没有值就不用
       */
       const options = {
-        ...this.options,
-        ...newOptions,
+        ...this.options, // 解构原本的对象
+        ...newOptions, // 解构新传入的对象,和原本对象重复的属性会被覆盖
       };
-      this.options = options;
+      this.options = options; // 将处理后的options赋值给老options
+      // console.log(this.options); // 打印1
       this.options = this.getGoodsList(options);
+      // this.getGoodsList(options);
+      // this.options = []; // 其实直接赋值为空就行了,要保证你的options是会随筛选条件更新的(只需要传递的配置对象即可)
+      /* 🍟🍟🍟
+        1.每次search都会请求数据,即getGoodsList(options)
+        2.请求goodsList之前,options是请求数据的参数对象
+        3.请求goodsList之后,options是返回的promise对象
+        4.每次search发送请求之前,都会将这次的options和传入的newOptions合并,每次发送出去的请求都是你行的newoptions
+        5.所以点击手机之后点击合约机,会改变newOptions参数
+      */
+      // console.log(this.options); // 打印2
+      /*
+        第一次search:
+          打印1是你合并之后的options对象,包含你的筛选条件
+          打印2是this.getGoodList(options)的返回值,是一个promise对象
+        第二次search:
+          打印1是你添加了筛选条件之后的option对象
+          打印2还是promise对象
+      */
     },
   },
   watch: {
     $route: {
+      // 监视路由属性的变化(如果页面params和query变化,$route就会变化[深度监视])
       handler(newVal) {
+        // #route内部数据变化,触发handler函数
         this.search({
-          ...newVal.query,
-          ...newVal.params,
+          ...newVal.query, // 解构路由变化后的query
+          ...newVal.params, // 解构params
         });
+        // search函数传入的是最新的$route查询字符串query和params
       },
-      deep: true,
-      immediate: true,
+      deep: true, // 深度监视:因为监视的不是$route而是监视的里面的params和query
+      immediate: true, // 页面加载直接触发一次
     },
   },
 

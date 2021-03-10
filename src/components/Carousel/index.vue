@@ -96,7 +96,7 @@ export default {
               delay: 1000,
             },
           });
-          console.log(this.swiper);
+          // console.log(this.swiper);
         });
       },
       immediate: true,
