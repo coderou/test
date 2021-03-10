@@ -1,8 +1,8 @@
 <template>
   <!-- 商品分类导航 -->
-  <div class="type-nav">
+  <div class="type-nav" @mouseleave="isShow = false">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
+      <h2 class="all" @mouseenter="isShow = true">全部商品分类</h2>
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -13,7 +13,7 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-      <div class="sort">
+      <div class="sort" v-if="isHome || isShow">
         <div class="all-sort-list2" @click="toSearch">
           <div
             v-for="item in categoryList"
@@ -96,6 +96,8 @@ export default {
   data() {
     return {
       // data: [],
+      isShow: false,
+      isHome: this.$route.path === '/', // 判断当前是不是首页
     };
   },
   computed: {

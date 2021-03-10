@@ -23,7 +23,7 @@
             <h3>
               <router-link
               :to="{
-                name:"Search", // 跳转到那个命名路由
+                name: "Search", // 跳转到那个命名路由
                 query:{
                   categoryName:item.categoryName,
                   category1ID:item.categoryId

@@ -23,3 +23,9 @@ export const reqGetFloors = () =>
     method: 'GET',
     url: '/floors',
   });
+export const reqGetGoodsList = (data) =>
+  request({
+    method: 'POST',
+    url: '/list',
+    data,
+  });

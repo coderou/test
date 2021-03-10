@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <TypeNav  /> -->
+    <TypeNav />
     <div class="main">
       <div class="py-container">
         <!--bread-->
@@ -17,7 +17,6 @@
             <li class="with-x">OPPO<i>×</i></li>
           </ul>
         </div>
-
         <!--selector-->
         <SearchSelector />
 
@@ -458,6 +457,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 import SearchSelector from './SearchSelector/SearchSelector';
 
 export default {
@@ -465,6 +465,23 @@ export default {
 
   components: {
     SearchSelector,
+  },
+  computed: {
+    ...mapGetters([
+      'trademarkList',
+      'attrsList',
+      'goodsList',
+      'total',
+      'pageSize',
+      'pageNo',
+      'totalPages',
+    ]),
+  },
+  methods: {
+    ...mapActions(['getGoodsList']),
+  },
+  mounted() {
+    this.getGoodsList({});
   },
 };
 </script>

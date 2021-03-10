@@ -60,14 +60,23 @@ export default {
   },
 
   methods: {
-    toSearch() {
+    /* toSearch() {
       // `/search/${this.keyword}`
       this.$router.history.push({
         name: 'Search',
         params: {
           keyword: this.keyword,
+          //如果有参数,没问题,如果没参数,是undefined,有问题,即,params如果写了,必须必须必须有值,不能是undefined
         },
       });
+    }, */
+    toSearch() {
+      const { keyword } = this;
+      const location = { name: 'Search' };
+      if (this.keyword) {
+        location.params = { keyword };
+      }
+      this.$router.history.push(location);
     },
   },
 };

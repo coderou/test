@@ -102,6 +102,9 @@
 🍟🍟13.🍟🍟开发遇到问题/开发经验:swiper实例参数1用css选择器,就是3个,换$ref之后,就是一个
   所以之前的3个其实就是页面一共有3个轮播图
   面试可以说!!
+  遇到了同一个页面使用多个swiper的时候,出现swiper实例是一个数组,这里涉及到知识点,如果new Swiper(参数1,{配置对象})的参数1是css选择器,就会选择页面上所有符合要求的元素,导致出现3个
+  ,而使用ref技术之后,参数1直接传递真实DOM,会因为this.$refs.xxx的this不同,而不会再互相干扰,同时mouseleave和mouseenter事件也不在需要[0]进行选择
+  ,另一个问题是当使用vuex传递给使用Carousel多个实例的时候,因为经过了中间层传递,出现
 14.生成指定大小的图片的工具
 15.1floors没有数据,不会生成Floor,有数据,那么carouseList也会有数据,所有watch不会监视到数据变化
 16.实现同一页面多个轮播图
@@ -219,3 +222,186 @@
 17.搜索
   #Header
 18.params必须和路由配合:要加上/:keyword
+19.如果传递的值是要改变的,不能定义在meta中
+20.在v-if或者v-show中,直接赋值true比 a=!a性能好,因为后者会额外经过一次getter,前面不会
+21.分别暴露直接引入是没有东西的
+22.搜索结果页面&显示隐藏&vuex获取数据&使用getter映射vuex的数据&
+  #api/index.js
+  {
+    export const reqGetGoodsList = (data) =>
+    request({
+      method: 'POST',
+      url: '/list',
+      data,
+    });
+  }
+  #router/routes.js
+  {
+    {
+      // 使用params必须要路由路径配置
+      path: '/search/:keyword?/', // params参数可传可不传,如果不加问号,表示必填
+      name: 'Search',
+      component: Search,
+    },
+  }
+  #components/TypeNav/index.vue
+  {
+    <template>
+      <div class="type-nav" @mouseleave="isShow = false">
+        <div class="container">
+          <h2 class="all" @mouseenter="isShow = true">全部商品分类</h2>
+          .....
+          <div class="sort" v-if="isHome || isShow"></div>
+        </div>
+      </div>
+    </template>
+    <script>
+      export default{
+        data(){
+          return {
+            isShow:false,
+            isHome:this.$route.path==='/',
+          }
+        }
+      }
+    </script>
+  }
+  #components/Header/Header.vue
+  {
+    <template>
+      <form @submit.prevent="toSearch">
+        <input
+          v-model="keyword"
+        />
+        <button type="submit">搜索</button> 
+      </form>
+    </template>
+    <script>
+      export default{
+        data(){
+          return {
+            keyword:'',
+          }
+        },
+        methods:{
+          toSearch(){
+            const {keyword}=this;
+            const location = {name:'Search'};
+            if(this.keyword){location.params = {keyword}};
+            this.$router.history.push(location);
+          }
+        }
+      }
+    </script> 
+  }
+  #store/modules/search.js
+  {
+    import { reqGetGoodsList } from '@/api';
+    export const state={
+      searchList: {
+        // 品牌列表数据
+        trademarkList: [],
+        // 商品属性列表数据
+        attrsList: [],
+        // 商品数据
+        goodsList: [],
+        // 商品总数
+        total: 0,
+        // 每页显示条数
+        pageSize: 5,
+        // 当前页数
+        pageNo: 1,
+        // 总页数
+        totalPages: 1,
+      },
+    };
+    export const getters={};
+    export const actions={
+      getGoodsList({commit},data){
+        reqGetGoodsList(data)
+        .then((searchList)=>{
+          commit('REQ_GET_GOODS_LIST', searchList);
+        })
+        .catch((message)=.{
+          console.log(message);
+        })
+      }
+    }
+    export const mutations={
+      REQ_GET_GOODS_LIST(state, searchList) {
+        state.searchList = searchList;
+      },
+    }
+  }
+  #store/modules/index.js
+  {
+    import * as search from './search';
+    export default{
+      search,
+    }
+  }
+  #store/getters.js
+  {
+    export default {
+      // 先用getter处理state的好处:1.有缓存 2.以后其他组件不需要写这么长
+      trademarkList(state) {
+        return state.search.searchList.trademarkList;
+      },
+      attrsList(state) {
+        return state.search.searchList.attrsList;
+      },
+      goodList(state) {
+        return state.search.searchList.goodList;
+      },
+      total(state) {
+        return state.search.searchList.total;
+      },
+      pageSize(state) {
+        return state.search.searchList.pageSize;
+      },
+      pageNo(state) {
+        return state.search.searchList.pageNo;
+      },
+      totalPages(state) {
+        return state.search.searchList.totalPages;
+      },
+    };
+  }
+  #store/index.js
+  {
+    import getters from './getters';
+    export default new Vuex.Store({
+      getters,
+    })
+  }
+  #views/Search/Search.vue
+  {
+    <template>
+      <TypeNav />
+      .....
+    </template>
+    <script>
+      import {mapGetters,mapActions} from 'vuex';
+      export default{
+        computed:{
+          ...mapGetters({
+            'trademarkList',
+            'attrsList',
+            'goodsList',
+            'total',
+            'pageSize',
+            'pageNo',
+            'totalPages',
+          })
+        },
+        methods:{
+          ...mapActions(['getGoodsList']),
+        },
+        mounted(){
+          this.getGoodsList({})// 功能未完成,可在devTool中查看vuex状态,获取数据成功
+        }
+      }
+    </script>
+  }
+23.params只要写了就必须传递参数,不能是undefined!!!,否则会跳转不过去
+  tip:routes的path加问号表示可选,{path:'Search/:keyword?'}
