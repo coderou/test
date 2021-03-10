@@ -1,0 +1,102 @@
+1.将来开发中的情况,要么写好了后台,要么没写好,绝大部分情况是后台写好了,但是可能会遇到突发情况,这时候需要用mock模拟数据
+2.meta:一旦地址匹配上了,就会传到$route中,可以通过$route获取meta传递的数据
+3.请求拦截器:设置公共的请求数据,比如token(用户识别令牌)
+4.面试:面试多半会问你有没有设置过请求拦截器,做了什么拦截器,有什么用
+5.面试:要清楚自己写了什么,能说出来,不一定要写出来代码,真实开发代码可以百度,可以参考,可以问
+6.三级导航的还不是很复杂,公司中拿到的数据要更加复杂
+7.真正复杂的是多个组件的数据交互,比如购物车
+8.swiper6支持的是vue3,
+9.使用mock的时候如果不知道数据结构什么样子,可以问后端,但是最好自己能写,起名字要有意义
+10.swiper想要真正生效,必须先有DOM元素,而这时候banners一开始是空数组,先渲染的carousel,再拿的数据,导致图片不显示且swiper单页
+11.swiper配合mock拿图片
+  tip:new Swiper必须必须必须在DOM生成之后再执行
+  tip:this.$nextTick():vue实例的方法,等待DOM元素挂载完毕之后,执行内部代码,且执行一次
+  tip:vue更新数据更新DOM是异步的,在MVVM中,是同步的,在源码中,会将cb放入回调队列执行
+  tip:new Swiper(参数1,{}),参数1可以是选择器也可以是真实dom元素
+    class选择器:页面所有具有相同class类的carousel,都会变成轮播图
+    真实dom元素:根据this不同,轮播图不同,只会对运用了carousel的组件起作用
+  tip:😂传递真实dom元素的方法:
+    dom元素:标签属性 ref="name"
+    实例使用:this.$refs.name  :  就是该dom元素
+  tip:Carousel:旋转木马,轮播图
+
+  #store/modules/home.js
+  {
+    import {reqGetBanners}from '@/api/index.js'
+    const state={
+      banners:[],
+    };
+    const mutations={
+      GET_BANNERS(state, banners) {
+        state.banners = banners;
+      },
+    };
+    const actions={
+      getBanners({ commit }) {
+        reqGetBanners()
+          .then((banners) => {
+            commit('GET_BANNERS', banners);
+          })
+          .catch((message) => {
+            console.log(message);
+          });
+      },
+      }
+  }
+  #views/Home/ListContainer.vue
+  {
+    <template>
+      <Carousel :carouselList="banners" />
+    </template>
+    <script>
+      import {mapState,mapActions} from 'vuex';
+      export default{
+        computed:{
+          ...mapState({
+            banners:(state)=>state.home.banners,
+          })
+        },
+        methods:{
+          ...map(['getBanners'])
+        },
+        mounted(){
+          this.getBanners()
+        },
+      }
+    </script> 
+  }
+  #/components/Carousel/index.vue
+  {
+    <template>
+      <div
+        class="swiper-container"
+        ref="swiper"
+        @mouseenter="swiper.autoplay.stop()"
+        @mouseleave="swiper.autoplay.start()"
+      >
+        <div class="swiper-wrapper">
+          <div v-for="image in carouselList" :key="image.id" class="swiper-slide">
+            <img :src="image.imgUrl" :alt="image.title" />
+          </div>
+        </div>
+      </div>
+    </template>
+    <script>
+      export default{
+        props:['carouselList],
+        watch:{
+          carouselList(){
+            this.$nextTick(){
+              this.swiper=new Swiper(this.$refs.swiper,{
+                .....
+              });
+              console.log(this.swiper)
+            };
+          },
+        },
+        mounted(){},
+      }
+    </script>
+  }
+12.watch监视carousel数据->拿到数据->watcher方法触发->DOM节点更新完成->this.$nextTick()触发->new Swiper
+13.

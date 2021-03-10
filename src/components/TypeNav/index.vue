@@ -14,7 +14,7 @@
         <a href="###">秒杀</a>
       </nav>
       <div class="sort">
-        <div class="all-sort-list2" @click.prevent="toSearch">
+        <div class="all-sort-list2" @click="toSearch">
           <div
             v-for="item in categoryList"
             :key="item.categoryId"
@@ -106,6 +106,7 @@ export default {
     }),
   },
   mounted() {
+    // #region
     // 1.0_直接axios发送
     /* axios({
       url: 'http://182.92.128.115/api/product/getBaseCategoryList',
@@ -124,6 +125,7 @@ export default {
         console.log(message);
       }); */
     // 2.0通过vuex映射
+    // #endregion
     this.getBaseCategoryList(); // 映射方法:可以
   },
   methods: {

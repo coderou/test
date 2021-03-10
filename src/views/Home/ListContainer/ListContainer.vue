@@ -3,7 +3,7 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--banner轮播-->
-        <Carousel />
+        <Carousel :carouselList="banners" />
       </div>
       <div class="right">
         <div class="news">
@@ -79,8 +79,21 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
+
 export default {
   name: 'ListContainer',
+  computed: {
+    ...mapState({
+      banners: (state) => state.home.banners,
+    }),
+  },
+  methods: {
+    ...mapActions(['getBanners']),
+  },
+  mounted() {
+    this.getBanners();// 调用方法拿数据,数据放在vuex
+  },
 };
 </script>
 

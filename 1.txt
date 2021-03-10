@@ -1,0 +1,317 @@
+1. 请谈谈 Vue 和 React 的区别（从多个维度）
+  1.对html的解析方式不同:模板和JSX
+    Vue:
+      vue.js吧html\css\js组合到一起
+      使用了基于html的模板语法,允许开发者声明式的将dom绑定至底层Vue实例的数据,
+      Vue.js的核心是一个允许你采用间接的模板语法来声明式的将数据渲染进DOM
+    React:
+      HTML语言直接写在js语言中,不加任何引号,简单说这是jsx的语法,允许html和js的混写,jsx语法使用babel进行编译
+  2.状态管理/数据存储方式不同:
+    Vue:
+      基本解释:配置对象中的数据,通过数据代理,在vue实例中直接通过this使用,甚至html模板中的this都可以简写
+      数据储存方式:data对象\computed计算属性\watch监视属性\props参数\methods方法
+    React:
+      基本解释:数据有state属性管理,但是不能直接改变state的状态,需要通过setState()方法去更新
+  3.条件渲染和列表渲染
+    Vue:
+      条件渲染:v-if指令,v-show指令
+      列表渲染:v-for指令 
+      基本写法:<li v-for="student in persons" :key:'student.id'>{{student.name}}</li>
+    React: 
+      条件渲染:直接在JSX中写{}表示js表达式,通过逻辑运算符 && , || , 三目运算符进行判断
+      列表渲染:在{}中配合数组map方法,直接返回渲染后的html 
+      基本写法:
+        {
+          person.map((student)=>{
+          return <li key="student.id">{student.name}</li>
+          })
+        }
+  4.路由管理
+    Vue:通过组件vue-router,进行全局配置,导致所有vue实例对象\组件对象都可以通过原型链访问$route,$router对象
+    React:通过react-router全局组件,react-router子组件作为 children 被传入父组件。
+  5.组件间通信方式
+    Vue:
+      父传子：通过父组件绑定自定义属性（或通过 v-bind 绑定动态属性），子组件使用 props 选项时显式的声明 props，以便它可以从父组件接收到期望的数据。
+      子传父：通过父组件绑定自定义事件，子组件通过 this.emit('自定义事件',value)传值。
+      非父子：可以使用一个空的 Vue 实例绑定在 Vue 实例的原型上作为一个事件总线中心(vue.prototype.eventBus = new Vue())，用 emit 触发事件，on 监听事件。 
+    React:
+      父传子：通 props 属性进行传递。
+      子传父：父组件定义事件，子组件触发父组件中的事件时，通过实参的形式来改变父组件中的数据来通信。
+      非父子：嵌套不深的非父子组件可以使共同父组件，嵌套的深可以用 redux 共享状态。
+
+2. 请谈谈 Vue-Router 以及 前端路由之间如何通信
+  1.Vue-router基本概念:
+    Vue-router是vue官方的一款插件,用于开发SPA(单页面应用)
+    什么是单页面应用:
+      整个引用只有一个完整页面,
+      点击链接不会发送请求,不会刷新,
+      只会跳转地址和局部更新组件
+  2.使用方法:
+    1.npm下载vue-router:npm install vue-router --save
+    2.Vue全局使用vue-router
+      import VueRouter from 'vue-router'
+      Vue.use(VueRouter)
+      const router=new VueRouter({
+        mode:'history',
+        routes:[
+          {
+            path:'/',
+            component:Home,
+          }
+        ]
+      })
+      new Vue({
+        router,
+        .....
+      })
+  3.2个核心组件:
+    1.<router-link to="路由地址"></router-link>
+      效果类似a标签,但是不会跳转页面,直接改变地址栏的地址
+    2.<router-view></router-view>
+      显示对应路由地址值的对应组件
+  4.2种模式
+    history模式:利用浏览器history对象进行跳转,优点是可以返回,兼容性一般
+    hash模式:兼容性最好,缺点是url地址栏有#号,可能会影响锚点的使用
+  5.2个核心对象:
+      1.$route:包含当前路由的信息
+      2.$router:包含路由跳转的方法
+        $router.history.push() 创建一个新的历史记录
+        $router.history.replace() 直接替换当前地址
+  6.路由通信方式
+    1.直接拼接查询字符串和路由参数
+      <router-link to="地址/路由参数?key=value">xxx</router-link>
+    2.命名路由
+      配置路由:{name:'RName'}
+      路由链接:
+      <router-link :to="{
+        name: 'xxx',
+        params: {  }, 
+        query: {  }, 
+      }">xxx</router-link>
+    tip:使用方式1\2数据(子路由使用)
+      this.$route.params
+      this.$route.query
+    3.props方式传参
+      将params或query参数以props方式传递到组件
+      配置路由:
+        props(#route){
+          return{
+            ...$route.query,
+            ...$route.params,
+          }
+        }
+    4.直接通过router-view传参
+      <router-view xxx="xxx"></router-view>
+    tip:使用方式3\4的数据
+      接收:props:['xxx']
+      使用:this.xxx
+  7.2种路由跳转方式:
+    1.router-link自带跳转功能
+    2.编程式导航 this.$router.history.push()
+  8.缓存路由组件(防止多次加载重复组件)
+    <keep-alive include="xx" exclude="xx" max="xx">
+      <router-view></router-view>
+    </keep-alive>
+  9.2个和keep-alive相关的生命周期函数
+    activated:活跃的,显示
+    deactivated:不活跃的,隐藏
+
+3. 请谈谈 Vue 的组件间通信（多个方案）
+  1.props:
+    父传子
+      <Child :key="value" />
+    子接收
+      props:['key']
+    子使用
+      this.key
+    注意点:
+      1.传递参数可以是函数或非函数数据,如果是函数数据,子组件可调用函数,达到子传父效果
+      2.props属性是只读的,不要直接修改
+      3.数据源在哪里,更新方法就在哪里
+  2.自定义事件:
+    使用方法:
+      绑定事件:
+        方法1:
+          <Child @事件名称="事件回调函数" />
+        方法2:
+          <Child ref='xxx'/> // 通过this.$listeners获取不到
+          mounted(){this.$refs.xxx.$on(事件名,回调函数)}
+          beforeDestory(){this.$refs.$off(事件名,回调函数)}// 如果什么都不写,全部解绑
+      触发事件:
+        1.this.$emit(事件名,参数1,参数2...)
+        2.this.$listeners.事件名(参数1,参数2)
+    注意点:
+      1.给某个组件绑定，就只有这个组件可以触发
+      2.click\mousemove等本质上都是自定义事件
+      3.组件实例对象上的方法
+        1.$on(事件名,cb) 绑定持久事件
+        2.$once(事件名,cb) 绑定一次性事件
+        3.$off(事件名,cb) 解绑事件
+        4.$emit(事件名,参数1,参数2) 触发事件
+  3.全局事件总线:
+    使用方法:
+      1.添加全局事件总线对象
+        Vue.prototype.$bus=new Vue()//方式1
+        beforeCreate(){Vue.prototype.$bus=this}//方式2
+      2.绑定事件(接收数据)
+        mounted(){this.$bus.$on(事件名,cb)}
+      3.触发事件(发送数据)
+        @click="this.$bus.$emit(事件名,参数)"
+    注意点:
+      1.适用于任意组件,但是通常用于兄弟和祖孙组件,父子用props,其他有vuex
+  4.插槽:
+    适用方法:
+      1.默认插槽
+        父传子
+          <Child>xxx</Child>
+        子使用
+          <slot/>
+      2.具名/命名插槽
+        父传子
+          <Child><template v-slot:xxx>xxx</template></Child>
+          <Child><template #xxx>xxx</template></Child>
+        子使用
+          <slot name="xxx"/>
+      3.作用域插槽
+        父接收
+          <Child><template v-slot:xxx="{yyy}"></template></Child>
+        子发送
+          <slot name="xxx" :yyy="yyy"/>
+    注意点:用于父子间通信(通信的是标签,是组件)
+    
+😀4. 请谈谈 Vue 的生命周期函数
+  - 组件从创建到销毁过程中自动触发的函数
+  - 挂载阶段（初始化）
+    - beforeCreate 在数据代理之前触发，所以不能通过 this 访问 data、methods、computed 等数据
+    - created 在数据代理之后
+    - beforeMount
+    - mounted
+      - 发送请求、设置定时器、绑定自定义事件等一次性任务
+      - 此时才能通过 ref 获取 DOM 元素
+  - 更新阶段
+    - beforeUpdate
+    - updated
+  - 卸载阶段
+    - beforeDestroy 清除定时器、解绑事件等收尾工作（防止内存泄漏）
+    - destroyed
+  - 当使用 keep-alive 缓存的组件会多两个生命周期函数
+    - activated
+    - deactivated
+
+😀5. 请谈谈 MVVM 的理解
+  - M - Model 数据层（data、methods、computed...）
+  - V - View 视图层（模板页面）
+  - VM - ViewModel 视图模型层（vm 实例对象）
+    - Model 的数据可以流向 View 视图（ViewModel 负责从 Model 读取数据渲染到 View 层）
+    - View 视图的数据发生修改可以流向 Model 层（ViewModel 负责绑定事件，从事件中读取 View 层修改的数据，再去修改 Model 的数据）
+    - 从而达到双向
+
+😀6. 请谈谈 Vue 的指令（至少 4 种主要使用的）
+  - v-model
+    - 用来双向数据绑定
+    - v-model="msg"
+  - v-bind
+    - 用来单向数据绑定（强制绑定数据）
+    - v-bind:value="msg"
+    - 简写 :value="msg"
+  - v-on
+    - 用来绑定事件
+    - v-on:click="handleClick"
+    - 简写 @click="handleClick"
+  - v-if / v-else-if / v-else
+    - 用来条件渲染
+    - v-if="isShow"
+    - 隐藏时会删除 DOM 元素
+  - v-show
+    - 用来条件渲染
+    - v-show="isShow"
+    - 隐藏时通过 display:none 控制
+  - v-for
+    - 用来列表渲染
+    - v-for="item, index in xxx" :key="item.id"
+    - 注意需要加上唯一的 key 属性
+    - 可以遍历对象和数组
+
+😀7. v-if 和 v-for 哪个优先级更高? 怎么做会更好
+  1.v-for优先级更高,源码中v-for比v-if先执行
+  2.如果同时出现,每次渲染都会先循环在判断条件,无论如何循环,都不可避免浪费了性能
+  3.解决:在外层嵌套<template></template>,在这层进行v-if判断,内部执行v-for循环,如果if判断不通过,循环不会执行
+
+😀8. vue 中 key 的作用
+  key的特殊attribute主要用在Vue的虚拟DOM算法中,在新旧Nodes对比时辨识VNodes
+  不使用key:Vue会使用一种最大限度减少动态元素并且尽可能的尝试就地修改、复用相同类型元素的算法
+  使用key:Vue会基于key的变化重新排列元素顺序,并且会移除key不存在的元素
+  其他:有相同父元素的子元素必须有独特的key,重复的key会造成渲染错误
+  tip:Vue.js的完整版,关于key的报错十分详细
+
+😀9. Vue 中 computed 和 watch 有什么区别？
+  1.computed:计算属性
+    作用:依赖其它的属性计算所得出最后的值,用于定义基于数据之上的数据
+  2.watch:监视属性,
+    作用:监听一个值的变化，执行相对应的函数,某个数据变化时做一些事情
+  3.总结：
+    1.如果一个数据依赖于其他数据，那么把这个数据设计为 computed
+    2.如果需要在某个数据变化时做一些事情，使用 watch 来观察这个数据变化
+    3.涉及到异步操作只能使用监视属性
+
+😀10. 组件中的 data 为什么是一个函数？
+  如果是对象:组件间公用一个data对象
+  函数:每个组件都有自己的data对象
+  原理:对象是引用类型数据,直接定义,所有组件指向同一data对象
+    data(){return {}}会在每次组件创建,都执行一次,每个组件的data不同
+
+11. 请谈谈 Vue 的响应式原理
+  1.基本概念:
+    1.Vue响应式简单介绍:数据变化,视图更新,视图更新,数据变化
+    2.Vue响应式涉及多个操作,通过数据代理,数据劫持,DOM事件监听,Dep:发布者\sub(watcher):订阅者等技术,实现了数据可以通过model层流向view视图层,可以通过view视图层的变化流向model层,中间经过了vue实例,我们一般称为:vm,这就是mvvm的基本解释
+    注意:model不一定是data对象,还可能是computed或methods等
+  2.核心流程
+    初始化:Vue从模板:<li>{{name}}</li> 到 html页面的过程中发生了什么?
+      1.实例化vm对象:
+        - 创建一个基本的vm实例用于挂载Vue相关的方法和data数据
+      2.数据代理:😂Vue.prototype._proxy()方法
+        - 实现通过this.xx直接访问配置对象中的数据,内部原理用到了Object.defineProperty()
+      3.数据劫持:😂Observe.prototype.defineReactive()方法
+        - 为每一个data数据,定义其dep对象
+        - 利用递归调用,实现配置对象的所有数据都被数据劫持
+      4.解析html页面模板
+        - 使用Fragment技术统一放置节点,提高页面渲染效率
+          页面节点添加到Fragment之后,会从DOM删除,使用while方法进行放入,性能较高
+        - 使用正则匹配含有指令\插值语法的DOM节点
+        - 每一个指令\插值语法的DOM节点,都有属于自己的更新节点的方法,比如textUpdater,
+        - 实例化一个Watcher,将更新DOM节点的方法传进去,简称cb:callback
+      5.watcher:订阅者
+        - 每一个watcher就对应页面上使用了数据的一个DOM,可能有1个DOM使用多个数据,也可能有多个DOM使用1个数据
+        - 在watcher实例化的过程中,访问了data中的值,触发了数据劫持阶段的getter方法,并且将该watcher放入到了该data的dep.subs中
+        - 同时watcher也将该dep放入到了自己的depIds中
+      6.模板解析完成,挂载页面
+    改变data数据发生了什么?
+      1.触发该data数据劫持的setter
+      2.对新传入的数据继续劫持,对应同一个dep
+      3.调用对应data的dep.notify(),对所有sub(watcher实例)进行通知
+      4.watcher实例调用cb方法更新DOM节点
+    如何实现数据双向绑定?
+      1.双向绑定主要指的是v-model可以实现view->model model->view
+      2.为Input,radio等和用户交互相关的DOM标签,绑定事件监听,比如input表单的input事件
+      3.触发事件,调用_setVMVal方法对匹配表达式内容的data,进行修改
+      4.触发setter,更新数据
+  3.dep和watcher的关系和数据结构
+    每一个data对应一个dep
+    每一个可解析数据的DOM节点对应一个watcher
+    当多个DOM节点使用同一个data,就有多个watcher在dep中
+    当一个DOM节点使用了多个data,就有多个dep在watcher中,比如{{num1+num2}}
+    数据结构:
+    dep:{
+      subs:[
+        0:watcher实例:{
+          cb:更新DOM节点的方法,
+          depIds:[
+            dep,
+          ]
+        },
+      ]
+    }
+  4.dep:发布者
+    dep对应的是数据层,当数据发生改变,经过数据劫持,会'触发'dep对象的对应方法dep.notify,见名知意,通知subs容器中的所有sub(watcher实例),之后所有watcher实例调用compile阶段保存的cb方法,对DOM进行更新,这就是发布的过程
+  5.watcher:订阅者
+    watcher对应的是视图层,也就是DOM层,虽然watcher的名字直译是监视者,但是实际上并非监视DOM的变化,比如input表单,是为表单绑定input事件实现的监视表单变化,watcher的作用是保存更新DOM节点的cb方法,真正触发DOM节点更新的是数据劫持的setter,里面会调用dep的notify()方法,通知所有watcher进行更新

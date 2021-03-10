@@ -2,10 +2,11 @@
 /*
 vuex管理的home模块
 */
-import { reqGetBaseCategoryList } from '@/api';
+import { reqGetBaseCategoryList, reqGetBanners } from '@/api';
 
 const state = {
   categoryList: [], // 所有分类的数组
+  banners: [],
 };
 
 const mutations = {
@@ -14,6 +15,9 @@ const mutations = {
   */
   RECEIVE_BASE_CATEGORY_LIST(state, list) {
     state.categoryList = list;
+  },
+  GET_BANNERS(state, banners) {
+    state.banners = banners;
   },
 };
 
@@ -31,6 +35,15 @@ const actions = {
     reqGetBaseCategoryList()
       .then((categoryList) => {
         commit('RECEIVE_BASE_CATEGORY_LIST', categoryList);
+      })
+      .catch((message) => {
+        console.log(message);
+      });
+  },
+  getBanners({ commit }) {
+    reqGetBanners()
+      .then((banners) => {
+        commit('GET_BANNERS', banners);
       })
       .catch((message) => {
         console.log(message);
