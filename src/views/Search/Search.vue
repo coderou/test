@@ -11,16 +11,24 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x" v-show="$route.query.categoryName">
-              {{ $route.query.categoryName }}~~~
+            <li
+              class="with-x"
+              v-show="$route.query.categoryName"
+              @click="deleteItem('query')"
+            >
+              {{ $route.query.categoryName }}~~~X
             </li>
-            <li class="with-x" v-show="$route.params.keyword">
-              {{ $route.params.keyword }}~~~
+            <li
+              class="with-x"
+              v-show="$route.params.keyword"
+              @click="deleteItem('params')"
+            >
+              {{ $route.params.keyword }}~~~X
             </li>
           </ul>
         </div>
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector :addItem="addItem" />
 
         <!--details-->
         <div class="details clearfix">
@@ -152,7 +160,6 @@ export default {
       },
     };
   },
-
   components: {
     SearchSelector,
   },
@@ -194,6 +201,39 @@ export default {
           打印2还是promise对象
       */
     },
+    deleteItem(item) {
+      // this.$route[p] = ''; // $route的params和route是只读的,不能直接改
+      const { keyword, query } = this.$route; // 拿到现在的keyword和query
+      const location = { name: 'Search' };
+      if (keyword) {
+        location.params = keyword;
+      }
+      if (query) {
+        location.query = query;
+      }
+      console.log(location);
+      location[item] = '';
+      this.$router.history.push(location);
+    },
+    addItem(item) {
+      // const { keyword, query } = this.$route; // 拿到现在的keyword和query
+      // const location = { name: 'Search' };
+      // if (keyword) {
+      //   this.options.keyword = keyword;
+      // }
+      // if (query) {
+      //   this.options.categoryName = query;
+      // }
+      // console.log(location);
+      // this.$router.history.push(location);
+      // this.search(location);
+
+      this.options.keyword = item;
+      // this.options = this.getGoodsList(this.options);//这里赋值是写错了
+      this.getGoodsList(this.options);
+      // this.options = []; // 最新消息,这里不能改为[],因为看了完整版本之后,这个组件基本上是最复杂的,想法基本和我一开始的意义
+      // options保存当前的params参数,query参数,筛选参数,每通过props或者trademark品牌改变options,就发送一次数据,说白了options是基本盘
+    },
   },
   watch: {
     $route: {
@@ -210,7 +250,6 @@ export default {
       immediate: true, // 页面加载直接触发一次
     },
   },
-
   mounted() {
     // this.search()
   },
