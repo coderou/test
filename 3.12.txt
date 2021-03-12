@@ -266,7 +266,7 @@
     </script>
   }
 10.elementUI实现分页器
-  🍔tip:安装vueelementui会导致app.vue被替换,并且无法撤回!!!必须备份
+  🍔tip:安装vue elementui会导致app.vue被替换,并且无法撤回!!!必须备份
   #控制台
   {
     vue add element

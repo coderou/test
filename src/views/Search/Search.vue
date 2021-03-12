@@ -148,7 +148,6 @@
 import { mapGetters, mapActions } from 'vuex';
 import SearchSelector from './SearchSelector/SearchSelector';
 
-
 export default {
   name: 'Search',
   data() {
