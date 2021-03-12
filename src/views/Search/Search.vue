@@ -16,14 +16,14 @@
               v-show="options.categoryName"
               @click="deleteItem('categoryName')"
             >
-              {{ $route.query.categoryName }}~~~X
+              {{ options.categoryName }}~~~X
             </li>
             <li
               class="with-x"
               v-show="options.keyword"
               @click="deleteItem('keyword')"
             >
-              {{ $route.params.keyword }}~~~X
+              {{ options.keyword }}~~~X
             </li>
             <li class="with-x" v-show="options.trademark" @click="deleteBrand">
               {{ options.trademark.split(':')[1] }}~~~X
@@ -31,7 +31,7 @@
           </ul>
         </div>
         <!--selector-->
-        <SearchSelector :addBrand="addBrand" />
+        <SearchSelector :search="search" />
 
         <!--details-->
         <div class="details clearfix">
@@ -139,22 +139,22 @@ import SearchSelector from './SearchSelector/SearchSelector';
 export default {
   name: 'Search',
   data() {
-    const {
-      category1Id,
-      category2Id,
-      category3Id,
-      categoryName,
-    } = this.$route.query; // 解构当前query中的参数
-    const { keyword } = this.$route.params; // 解构params参数
+    // const {
+    //   category1Id,
+    //   category2Id,
+    //   category3Id,
+    //   categoryName,
+    // } = this.$route.query; // 解构当前query中的参数
+    // const { keyword } = this.$route.params; // 解构params参数
     return {
       // 搜索条件
       options: {
         // 定义options保存params的数据和query的数据,以及其他筛选条件的数据,当数据变化,就会刷新页面
-        category1Id,
-        category2Id,
-        category3Id,
-        categoryName,
-        keyword,
+        category1Id: '',
+        category2Id: '',
+        category3Id: '',
+        categoryName: '',
+        keyword: '',
         order: '',
         pageNo: 1,
         pageSize: 10,
@@ -222,17 +222,24 @@ export default {
     },
   },
   watch: {
+    // 监视地址的变化(params\query)
     $route: {
-      // 监视路由属性的变化(如果页面params和query变化,$route就会变化[深度监视])
       handler(newVal) {
-        // #route内部数据变化,触发handler函数
+        const {
+          category1Id,
+          category2Id,
+          category3Id,
+          categoryName,
+        } = newVal.query;
+        const { keyword } = newVal.params;
         this.search({
-          ...newVal.query, // 解构路由变化后的query
-          ...newVal.params, // 解构params
+          category1Id,
+          category2Id,
+          category3Id,
+          categoryName,
+          keyword,
         });
-        // search函数传入的是最新的$route查询字符串query和params
       },
-      deep: true, // 深度监视:因为监视的不是$route而是监视的里面的params和query
       immediate: true, // 页面加载直接触发一次
     },
   },

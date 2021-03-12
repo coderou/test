@@ -7,7 +7,7 @@
           <li
             v-for="trademark in trademarkList"
             :key="trademark.tmId"
-            @click="addBrand(trademark)"
+            @click="searchTrademark(`${trademark.tmId}:${trademark.tmName}`)"
           >
             {{ trademark.tmName }}
           </li>
@@ -37,9 +37,14 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'SearchSelector',
-  props: ['addBrand'],
+  props: ['search'],
   computed: {
     ...mapGetters(['trademarkList', 'attrsList']),
+  },
+  methods: {
+    searchTrademark(trademark) {
+      this.search({ trademark });
+    },
   },
 };
 </script>

@@ -71,22 +71,19 @@ export default {
       });
     }, */
     toSearch() {
-      const { keyword } = this; // 通过结构拿到this.keyword(用户输入的内容)
-      const { query } = this.$route; // 通过结构拿到route跳转链接中的query参数,比如三级导航的手机
+      const { keyword } = this;
+      const { query } = this.$route;
+      const location = { name: 'Search' };
 
-      const location = { name: 'Search' }; // 设置一个对象,保存基本的地址,当跳转的时候,push进去的是这个对象
       if (keyword) {
-        // 如果有keyword,将keyword添加进去
         location.params = { keyword };
       }
+      // 为了点击搜索按钮的时候,query参数不丢失
       if (query.categoryName) {
-        // 如果query参数中有categoryName,添加进去
-        // 主要目的是为了当用户在Search页面进行搜索,不会因为搜索输入而去掉query的三级导航筛选
         location.query = query;
       }
 
-      // this.$bus.$emit('search', { keyword });//这里是尝试切换页面的同时触发$bus的事件,更新界面,但是失败了,也就不需要$bus了
-      this.$router.history.push(location); // 通过$route.history对象的push方法,跳转页面
+      this.$router.history.push(location);
     },
   },
 };

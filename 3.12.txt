@@ -1,3 +1,120 @@
 1.git 不要推送太多次,否则时间线不好查看
-2.面试:开发经验:
-  1.vite:
+2.swiper6一定只支持Vue3????
+3.轮播图:
+  轮播图数据是异步加载的,所以要利用监视属性和$nextTick()方法,保证在dom元素加载完成后,再new Swiper
+  watch:监视store有没有拿到图片数据
+  $nextTick():dom是否渲染完成
+  watch特点:数据第一次过来是不会触发的,想要一上来就触发,加immediate
+  注意点:上面大banner和下面小轮播图,下面是一开始就有图片的,上面一开始没有图片,要监视上面banner有数据的时候才new
+  注意点2:通过$refs.xxx得到的是真实dom,这时候new Swiper的返回值不会通过class类选择,而是因为this不同而不同,也就不会导致swiper实例变为数组
+4.Search组件:
+5.当地址改变,刷新页面
+  #views/Search/Search.vue
+  {
+    <template>
+      <li class="with-x" v-show="options.trademark" @click="deleteBrand">
+        {{ options.trademark.split(':')[1] }}~~~X
+      </li>
+      .....
+      <SearchSelector :search="search" />
+      .....
+    </template>
+    <script>
+      export default{
+        data() {
+          return {
+            options: {
+              category1Id: '',
+              category2Id: '',
+              category3Id: '',
+              categoryName: '',
+              keyword: '',
+              order: '',
+              pageNo: 1,
+              pageSize: 10,
+              props: [],
+              trademark: '',
+            },
+          };
+        },
+        watch:{
+          $route:{
+            handler(newVal){
+              const {
+                category1Id,
+                category2Id,
+                category3Id,
+                categoryName,
+              } = newVal.query;
+              const { keyword } = newVal.params;
+              this.search({
+                category1Id,
+                category2Id,
+                category3Id,
+                categoryName,
+                keyword,
+              });
+            },
+            immediate:true,
+          }
+        },
+        methods:{
+          search(newOptions = {}) {
+            const options = {
+              ...this.options,
+              ...newOptions,
+            };
+            this.options = options;
+            this.getGoodsList(options);
+          },
+        },
+      }
+    </script> 
+  }
+  #views/Search/SearchSelector/SearchSelector.vue
+  {
+    <template>
+      <li
+        v-for="trademark in trademarkList"
+        :key="trademark.tmId"
+        @click="searchTrademark(`${trademark.tmId}:${trademark.tmName}`)"
+      >
+        {{ trademark.tmName }}
+      </li>
+    </template>
+    <script>
+      export default{
+        props: ['search'],
+        methods: {
+          searchTrademark(trademark) {
+            this.search({ trademark });
+          },
+        },
+      }
+    </script>
+  }
+  #components/Header
+  {
+    <script>
+      export default{
+        methods:{
+          toSearch(){
+            const { keyword } = this;
+            const { query } = this.$route;
+            const location = { name: 'Search' };
+            // 点击搜索按钮,设置keyword
+            if (keyword) {
+              location.params = { keyword };
+            }
+            // 为了点击搜索按钮的时候,query参数不丢失
+            if (query.categoryName) {
+              location.query = query;
+            }
+            // 改变url地址,触发#views/Search/Search.vue 中的watch $route,拿到数据
+            this.$router.history.push(location);
+          }
+        },
+      }
+    </script>
+  }
+6.
