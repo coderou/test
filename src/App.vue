@@ -28,10 +28,6 @@ export default {
     Footer,
     Header,
   },
-  async mounted() {
-    // const result = await reqBaseCategoryList();
-    // console.log('result', result);
-  },
 };
 </script>
 

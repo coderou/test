@@ -359,6 +359,7 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
 import ImageList from './ImageList/ImageList';
 import Zoom from './Zoom/Zoom';
 
@@ -369,8 +370,16 @@ export default {
     ImageList,
     Zoom,
   },
+  computed: {
+    ...mapState(['good']),
+  },
+  methods: {
+    ...mapActions(['getDetail']),
+  },
   mounted() {
+    this.getDetail();
     console.log(this.$route.params);
+    console.log(this.good);
   },
 };
 </script>

@@ -87,7 +87,7 @@
 <script>
 export default {
   name: 'Rank',
-}
+};
 </script>
 
 <style  lang="less" scoped>

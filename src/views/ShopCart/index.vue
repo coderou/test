@@ -125,9 +125,9 @@
 </template>
 
 <script>
-  export default {
-    name: 'ShopCart',
-  }
+export default {
+  name: 'ShopCart',
+};
 </script>
 
 <style lang="less" scoped>

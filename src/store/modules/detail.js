@@ -1,13 +1,13 @@
 import { reqGetDetail } from '@/api';
 
 export const state = {
-  GoodInfo: {
+  good: {
   },
 };
 export const getters = {};
 export const actions = {
-  getGoodsList({ commit }, data) {
-    reqGetDetail(data)
+  getDetail({ commit }, id) {
+    reqGetDetail(id)
       .then((searchList) => {
         commit('REQ_GET_DETAIL', searchList);
       })
@@ -17,7 +17,7 @@ export const actions = {
   },
 };
 export const mutations = {
-  REQ_GET_DETAIL(state, GoodInfo) {
-    state.GoodInfo = GoodInfo;
+  REQ_GET_DETAIL(state, good) {
+    state.good = good;
   },
 };

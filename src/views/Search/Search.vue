@@ -44,23 +44,45 @@
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li
+                  :class="{ active: order[0] === '1' }"
+                  @click="setOrder('1')"
+                >
+                  <a
+                    >综合
+                    <span
+                      v-show="order[0] === '1'"
+                      :class="{
+                        iconfont: true,
+                        'icon-direction-down': order[1] === 'desc',
+                        'icon-direction-up': order[1] === 'asc',
+                      }"
+                    ></span>
+                  </a>
                 </li>
                 <li>
-                  <a href="#">销量</a>
+                  <a>销量</a>
                 </li>
                 <li>
-                  <a href="#">新品</a>
+                  <a>新品</a>
                 </li>
                 <li>
-                  <a href="#">评价</a>
+                  <a>评价</a>
                 </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                <li
+                  :class="{ active: order[0] === '2' }"
+                  @click="setOrder('2')"
+                >
+                  <a
+                    >价格<span
+                      v-show="order[0] === '2'"
+                      :class="{
+                        iconfont: true,
+                        'icon-direction-down': order[1] === 'desc',
+                        'icon-direction-up': order[1] === 'asc',
+                      }"
+                    ></span
+                  ></a>
                 </li>
               </ul>
             </div>
@@ -105,33 +127,16 @@
             </ul>
           </div>
           <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div><span>共10页&nbsp;</span></div>
-            </div>
+            <el-pagination
+              background
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="options.pageNo"
+              :page-size="options.pageSize"
+              :page-sizes="[5, 10, 15, 20]"
+              layout="prev,pager,next,sizes,total"
+              :total="total"
+            ></el-pagination>
           </div>
         </div>
       </div>
@@ -142,6 +147,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import SearchSelector from './SearchSelector/SearchSelector';
+
 
 export default {
   name: 'Search',
@@ -162,9 +168,9 @@ export default {
         category3Id: '',
         categoryName: '',
         keyword: '',
-        order: '',
-        pageNo: 1,
-        pageSize: 10,
+        order: '1:desc',
+        pageNo: 1, // 当前页面
+        pageSize: 5, // 每页条数
         props: [],
         trademark: '',
       },
@@ -174,13 +180,40 @@ export default {
     SearchSelector,
   },
   computed: {
-    ...mapGetters(['goodsList']),
+    ...mapGetters(['goodsList', 'total']),
+    order() {
+      return this.options.order.split(':');
+    },
     props() {
       return this.options.props.map((prop) => prop.split(':'));
     },
   },
   methods: {
     ...mapActions(['getGoodsList']),
+    // element:改变当前是第几页
+    handleCurrentChange(currentPage) {
+      this.options.pageNo = currentPage;
+      this.search();
+    },
+    // element:改变当前显示几页
+    handleSizeChange(pageSize) {
+      this.options.pageSize = pageSize;
+      this.search();
+    },
+    setOrder(order) {
+      /*
+        当从综合切换到价格时,默认是降序,反之也是,
+      */
+      const orderArr = this.options.order.split(':');
+      let orderType;
+      if (order === orderArr[0]) {
+        orderType = orderArr[1] === 'desc' ? 'asc' : 'desc';
+      } else {
+        orderType = 'desc';
+      }
+      this.options.order = `${order}:${orderType}`;
+      this.search();
+    },
     delCategory() {
       /* this.options.category1Id = '';
       this.options.category2Id = '';
@@ -553,90 +586,92 @@ export default {
       }
 
       .page {
-        width: 733px;
+        // width: 733px;
         height: 66px;
         overflow: hidden;
-        float: right;
+        // float: right;
+        display: flex;
+        justify-content: center;
 
-        .sui-pagination {
-          margin: 18px 0;
+        // .sui-pagination {
+        //   margin: 18px 0;
 
-          ul {
-            margin-left: 0;
-            margin-bottom: 0;
-            vertical-align: middle;
-            width: 490px;
-            float: left;
+        //   ul {
+        //     margin-left: 0;
+        //     margin-bottom: 0;
+        //     vertical-align: middle;
+        //     width: 490px;
+        //     float: left;
 
-            li {
-              line-height: 18px;
-              display: inline-block;
+        //     li {
+        //       line-height: 18px;
+        //       display: inline-block;
 
-              a {
-                position: relative;
-                float: left;
-                line-height: 18px;
-                text-decoration: none;
-                background-color: #fff;
-                border: 1px solid #e0e9ee;
-                margin-left: -1px;
-                font-size: 14px;
-                padding: 9px 18px;
-                color: #333;
-              }
+        //       a {
+        //         position: relative;
+        //         float: left;
+        //         line-height: 18px;
+        //         text-decoration: none;
+        //         background-color: #fff;
+        //         border: 1px solid #e0e9ee;
+        //         margin-left: -1px;
+        //         font-size: 14px;
+        //         padding: 9px 18px;
+        //         color: #333;
+        //       }
 
-              &.active {
-                a {
-                  background-color: #fff;
-                  color: #e1251b;
-                  border-color: #fff;
-                  cursor: default;
-                }
-              }
+        //       &.active {
+        //         a {
+        //           background-color: #fff;
+        //           color: #e1251b;
+        //           border-color: #fff;
+        //           cursor: default;
+        //         }
+        //       }
 
-              &.prev {
-                a {
-                  background-color: #fafafa;
-                }
-              }
+        //       &.prev {
+        //         a {
+        //           background-color: #fafafa;
+        //         }
+        //       }
 
-              &.disabled {
-                a {
-                  color: #999;
-                  cursor: default;
-                }
-              }
+        //       &.disabled {
+        //         a {
+        //           color: #999;
+        //           cursor: default;
+        //         }
+        //       }
 
-              &.dotted {
-                span {
-                  margin-left: -1px;
-                  position: relative;
-                  float: left;
-                  line-height: 18px;
-                  text-decoration: none;
-                  background-color: #fff;
-                  font-size: 14px;
-                  border: 0;
-                  padding: 9px 18px;
-                  color: #333;
-                }
-              }
+        //       &.dotted {
+        //         span {
+        //           margin-left: -1px;
+        //           position: relative;
+        //           float: left;
+        //           line-height: 18px;
+        //           text-decoration: none;
+        //           background-color: #fff;
+        //           font-size: 14px;
+        //           border: 0;
+        //           padding: 9px 18px;
+        //           color: #333;
+        //         }
+        //       }
 
-              &.next {
-                a {
-                  background-color: #fafafa;
-                }
-              }
-            }
-          }
+        //       &.next {
+        //         a {
+        //           background-color: #fafafa;
+        //         }
+        //       }
+        //     }
+        //   }
 
-          div {
-            color: #333;
-            font-size: 14px;
-            float: right;
-            width: 241px;
-          }
-        }
+        //   div {
+        //     color: #333;
+        //     font-size: 14px;
+        //     float: right;
+        //     width: 241px;
+        //   }
+        // }
       }
     }
   }

@@ -189,4 +189,141 @@
       }
     </script>
   }
-7.
+7.vue add element:安装可按需加载的element
+8.有的公司发的电脑可能是烂的,为了保护代码
+9.#升序降序
+  tip:下载iconfont,并且引入
+  #main.js
+  {
+    import "@/assets/font/iconfont.css";
+  }
+  #views/Search/Search.vue
+  {
+    <template>
+      <li
+        :class="{ active: order[0] === '1' }"
+        @click="setOrder('1')"
+        >
+        <a
+          >综合
+          <span
+            v-show="order[0] === '1'"
+            :class="{
+              ifonfont: true,
+              'icon-direction-down': order[1] === 'desc',
+              'icon-direction-up': order[1] === 'asc',
+            }"
+          ></span>
+        </a>
+      </li>
+      .....
+      <li
+        :class="{ active: order[0] === '2' }"
+        @click="setOrder('2')"
+        >
+        <a
+          >价格<span
+            v-show="order[0] === '2'"
+            :class="{
+              ifonfont: true,
+              'icon-direction-down': order[1] === 'desc',
+              'icon-direction-up': order[1] === 'asc',
+            }"
+          ></span
+        ></a>
+      </li>
+
+    </template>
+    <script>
+      export default{
+        data(){
+          return {
+            options:{
+              order: '1:desc',
+            }
+          }
+        },
+        computed:{
+          order(){
+            return this.options.order.split(':');
+          },
+        },
+        methods:{
+          setOrder(order) {
+            // 当从综合切换到价格时,默认是降序,反之也是,
+            const orderArr = this.options.order.split(':');
+            let orderType;
+            if (order === orderArr[0]) {
+              orderType = orderArr[1] === 'desc' ? 'asc' : 'desc';
+            } else {
+              orderType = 'desc';
+            }
+            this.options.order = `${order}:${orderType}`;
+            this.search();
+          },
+        }
+      }
+    </script>
+  }
+10.elementUI实现分页器
+  🍔tip:安装vueelementui会导致app.vue被替换,并且无法撤回!!!必须备份
+  #控制台
+  {
+    vue add element
+  }
+  #main.js
+  {
+    import './plugins/element.js';
+  }
+  #plugins/element.js
+  {
+    import Vue from 'vue';
+    import { Pagination } from 'element-ui';
+    Vue.use(Pagination);
+  }
+  #views/Search/Search.vue
+  {
+    <template>
+      <div class="fr page">
+        <el-pagination
+          background
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="options.pageNo"
+          :page-size="options.pageSize"
+          :page-sizes="[5, 10, 15, 20]"
+          layout="prev,pager,next,sizes,total"
+          :total="total"
+        ></el-pagination>
+      </div>
+    </template>
+    <script>
+      export default{
+        data(){
+          return {
+            options:{
+              pageNo: 1, // 当前页面
+              pageSize: 5, // 每页条数
+            }
+          }
+        },
+        computed:{
+          ...mapGetters(['goodsList', 'total']),
+        },
+        methods:{
+          // element:改变当前是第几页
+          handleCurrentChange(currentPage) {
+            this.options.pageNo = currentPage;
+            this.search();
+          },
+          // element:改变当前显示几页
+          handleSizeChange(pageSize) {
+            this.options.pageSize = pageSize;
+            this.search();
+          },
+        },
+      }
+    </script>
+  }
+11.自定义分页器组件
+  

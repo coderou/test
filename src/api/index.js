@@ -29,9 +29,9 @@ export const reqGetGoodsList = (data) =>
     url: '/list',
     data,
   });
-export const reqGetDetail = (data) =>
+export const reqGetDetail = (params) =>
   request({
     method: 'GET',
     url: '/item',
-    data,
+    params,
   });
