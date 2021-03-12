@@ -14,19 +14,25 @@
             <li
               class="with-x"
               v-show="options.categoryName"
-              @click="deleteItem('categoryName')"
+              @click="delCategory"
             >
               {{ options.categoryName }}~~~X
             </li>
-            <li
-              class="with-x"
-              v-show="options.keyword"
-              @click="deleteItem('keyword')"
-            >
+            <li class="with-x" v-show="options.keyword" @click="delKeyword">
               {{ options.keyword }}~~~X
             </li>
-            <li class="with-x" v-show="options.trademark" @click="deleteBrand">
+            <li class="with-x" v-show="options.trademark" @click="delTrademark">
               {{ options.trademark.split(':')[1] }}~~~X
+            </li>
+            <!-- 不需要v-show了,因为有v-for,没有数据就自然不会展示 -->
+            <li
+              class="with-x"
+              v-for="prop in props"
+              :key="prop[0]"
+              @click="delProps(prop[0])"
+            >
+              <!-- 当插值语法比较长比较复杂的时候,建议通过计算属性简写 -->
+              {{ `${prop[2]}:${prop[1]}` }}~~~X
             </li>
           </ul>
         </div>
@@ -64,9 +70,10 @@
               <li class="yui3-u-1-5" v-for="goods in goodsList" :key="goods.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="###" target="_blank"
+                    <!-- :to="{path:'/Detail/',params:{skuId:goods.id},}" -->
+                    <router-link :to="`/detail/${goods.id}`" target="_blank"
                       ><img :src="goods.defaultImg"
-                    /></a>
+                    /></router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -168,17 +175,70 @@ export default {
   },
   computed: {
     ...mapGetters(['goodsList']),
+    props() {
+      return this.options.props.map((prop) => prop.split(':'));
+    },
   },
   methods: {
     ...mapActions(['getGoodsList']),
+    delCategory() {
+      /* this.options.category1Id = '';
+      this.options.category2Id = '';
+      this.options.category3Id = '';
+      this.options.categoryName = '';
+      this.search(); */
+
+      // 地址改变,触发监视属性
+      this.$router.history.push({
+        name: 'Search',
+        params: this.$route.params,
+      });
+    },
+    delKeyword() {
+      this.$router.history.push({
+        name: 'Search',
+        query: this.$route.query,
+      });
+    },
+    delTrademark() {
+      this.options.trademark = '';
+      this.search();
+    },
+    delProps(id) {
+      this.options.props = this.options.props.filter(
+        (p) => p.indexOf(id) === -1,
+      );
+      this.search();
+    },
     getProductList() {
       this.getGoodsList(this.options);
     },
     search(newOptions = {}) {
+      // if (newOptions.props) {
+      //   this.options.props.push(newOptions.props);
+      //   delete newOptions.props;
+      // }
+      const { props } = this.options;
+      const newProps = newOptions.props;
+      // 判断新添加的props是否已经存在了
+      if (newOptions.props) {
+        // 之前保存过,return
+        if (props.indexOf(newProps) !== -1) return;
+        // 要添加props,且props之前没有添加过
+        props.push(newProps);
+      }
+
       const options = {
         ...this.options,
         ...newOptions,
+        // [之前的值,新值(可能为空)].filter(Boolean)过滤掉undefined
+        props,
+        // props: [...this.options.props, newOptions.props].filter(Boolean),
+        // 简写:props: [...this.options.props, newOptions.props].filter((item)=>{
+        //   return Boolean(item);
+        // }),
       };
+
       this.options = options;
       this.getGoodsList(options);
     },

@@ -29,3 +29,9 @@ export const reqGetGoodsList = (data) =>
     url: '/list',
     data,
   });
+export const reqGetDetail = (data) =>
+  request({
+    method: 'GET',
+    url: '/item',
+    data,
+  });

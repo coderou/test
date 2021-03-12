@@ -117,4 +117,76 @@
       }
     </script>
   }
-6.
+6.筛选属性&删除属性筛选:
+  tip:
+  #views/Search/SearchSelector/SearchSelector.vue
+  {
+    <template>
+      <li
+        @click="searchAttr(`${attrs.attrId}:${attr}:${attrs.attrName}`)"
+        v-for="attr in attrs.attrValueList"
+        :key="attr.attrId"
+      >
+        <a>{{ attr }}</a>
+      </li>
+    </template>
+    <script>
+      export default{
+        methods:{
+          searchAttr(props) {
+            this.search({ props });
+          },
+        }
+      }
+    </script>
+  }
+  #view/Search/Search.vue
+  {
+    <template>
+      <li @click="delCategory">
+      </li>
+      <li @click="delKeyword">
+      </li>
+      <li @click="delTrademark">
+      </li>
+      <li 
+        v-for="prop in props"
+        :key="prop[0]"
+        @click="delProps(props[0])"
+      >
+        {{`${prop[2]}:${prop[1]}`}}
+      </li>
+    </template>
+    <script>
+      export default{
+        computed:{
+          props(){
+            return this.options.props.map(p=>p.split(':'))
+          }
+        },
+        methods:{
+          delCategory(){
+            this.$router.history.push({
+              name:'Search',
+              params:this.options.params,
+            })
+          },
+          delKeyword(){
+            this.$router.history.push({
+              name:'Search',
+              query:this.$route.query,
+            })
+          },
+          delTrademark(){
+            this.options.trademark="",
+            this.search(),
+          },
+          delProps(id){
+            this.options.props=this.options.filter(p=>p.indexOf(id)====-1)
+            this.search()
+          }
+        }
+      }
+    </script>
+  }
+7.

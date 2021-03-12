@@ -22,7 +22,11 @@
       <div class="fl key">{{ attrs.attrName }}</div>
       <div class="fl value">
         <ul class="type-list">
-          <li v-for="attr in attrs.attrValueList" :key="attr.attrId">
+          <li
+            @click="searchAttr(`${attrs.attrId}:${attr}:${attrs.attrName}`)"
+            v-for="attr in attrs.attrValueList"
+            :key="attr.attrId"
+          >
             <a>{{ attr }}</a>
           </li>
         </ul>
@@ -44,6 +48,9 @@ export default {
   methods: {
     searchTrademark(trademark) {
       this.search({ trademark });
+    },
+    searchAttr(props) {
+      this.search({ props });
     },
   },
 };

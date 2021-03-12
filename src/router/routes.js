@@ -2,6 +2,7 @@ import Home from '@/views/Home/Home.vue';
 import Search from '@/views/Search/Search.vue';
 import Register from '@/views/Register/Register.vue';
 import Login from '@/views/Login/Login.vue';
+import Detail from '@/views/Detail/Detail.vue';
 
 export default [
   {
@@ -34,5 +35,10 @@ export default [
     path: '/search/:keyword?/', // params参数可传可不传,如果不加问号,表示必填
     name: 'Search',
     component: Search,
+  },
+  {
+    path: '/detail/:skuId?/',
+    name: 'Detail',
+    component: Detail,
   },
 ];
