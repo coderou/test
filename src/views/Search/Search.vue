@@ -13,22 +13,25 @@
           <ul class="fl sui-tag">
             <li
               class="with-x"
-              v-show="$route.query.categoryName"
-              @click="deleteItem('query')"
+              v-show="options.categoryName"
+              @click="deleteItem('categoryName')"
             >
               {{ $route.query.categoryName }}~~~X
             </li>
             <li
               class="with-x"
-              v-show="$route.params.keyword"
-              @click="deleteItem('params')"
+              v-show="options.keyword"
+              @click="deleteItem('keyword')"
             >
               {{ $route.params.keyword }}~~~X
+            </li>
+            <li class="with-x" v-show="options.trademark" @click="deleteBrand">
+              {{ options.trademark.split(':')[1] }}~~~X
             </li>
           </ul>
         </div>
         <!--selector-->
-        <SearchSelector :addItem="addItem" />
+        <SearchSelector :addBrand="addBrand" />
 
         <!--details-->
         <div class="details clearfix">
@@ -164,46 +167,29 @@ export default {
     SearchSelector,
   },
   computed: {
-    ...mapGetters(['goodsList']), // getters拿到goodsList进行渲染
+    ...mapGetters(['goodsList']),
   },
   methods: {
-    ...mapActions(['getGoodsList']), // 映射拿数据的方法
+    ...mapActions(['getGoodsList']),
+    getProductList() {
+      this.getGoodsList(this.options);
+    },
     search(newOptions = {}) {
-      // 定义一个search方法,默认传递参数对象
-      // category1Id=undefined不影响搜索
-      /*
-        如果是在当前页面更新params参数,参数不会立即更新,所以需要手动传过来
-        有值就用,没有值就不用
-      */
       const options = {
-        ...this.options, // 解构原本的对象
-        ...newOptions, // 解构新传入的对象,和原本对象重复的属性会被覆盖
+        ...this.options,
+        ...newOptions,
       };
-      this.options = options; // 将处理后的options赋值给老options
-      // console.log(this.options); // 打印1
-      this.options = this.getGoodsList(options);
-      // this.getGoodsList(options);
-      // this.options = []; // 其实直接赋值为空就行了,要保证你的options是会随筛选条件更新的(只需要传递的配置对象即可)
-      /* 🍟🍟🍟
-        1.每次search都会请求数据,即getGoodsList(options)
-        2.请求goodsList之前,options是请求数据的参数对象
-        3.请求goodsList之后,options是返回的promise对象
-        4.每次search发送请求之前,都会将这次的options和传入的newOptions合并,每次发送出去的请求都是你行的newoptions
-        5.所以点击手机之后点击合约机,会改变newOptions参数
-      */
-      // console.log(this.options); // 打印2
-      /*
-        第一次search:
-          打印1是你合并之后的options对象,包含你的筛选条件
-          打印2是this.getGoodList(options)的返回值,是一个promise对象
-        第二次search:
-          打印1是你添加了筛选条件之后的option对象
-          打印2还是promise对象
-      */
+      this.options = options;
+      this.getGoodsList(options);
     },
     deleteItem(item) {
-      // this.$route[p] = ''; // $route的params和route是只读的,不能直接改
-      const { keyword, query } = this.$route; // 拿到现在的keyword和query
+      /* delete this.options.categoryName;
+      delete this.options.category3Id; // category3Id也要改
+      delete this.options.category2Id; // category2Id也要改
+      delete this.options.category1Id; // category1Id也要改
+      this.getGoodsList(this.options); */
+
+      /* const { keyword, query } = this.$route; // 拿到现在的keyword和query
       const location = { name: 'Search' };
       if (keyword) {
         location.params = keyword;
@@ -211,28 +197,28 @@ export default {
       if (query) {
         location.query = query;
       }
-      console.log(location);
-      location[item] = '';
+      delete location.query[item];
       this.$router.history.push(location);
-    },
-    addItem(item) {
-      // const { keyword, query } = this.$route; // 拿到现在的keyword和query
-      // const location = { name: 'Search' };
-      // if (keyword) {
-      //   this.options.keyword = keyword;
-      // }
-      // if (query) {
-      //   this.options.categoryName = query;
-      // }
-      // console.log(location);
-      // this.$router.history.push(location);
-      // this.search(location);
 
-      this.options.keyword = item;
-      // this.options = this.getGoodsList(this.options);//这里赋值是写错了
-      this.getGoodsList(this.options);
-      // this.options = []; // 最新消息,这里不能改为[],因为看了完整版本之后,这个组件基本上是最复杂的,想法基本和我一开始的意义
-      // options保存当前的params参数,query参数,筛选参数,每通过props或者trademark品牌改变options,就发送一次数据,说白了options是基本盘
+      this.$router.history.replace({ name: 'Search' }); */
+      if (item === 'keyword') {
+        delete this.options[item];
+        this.getProductList(this.options);
+        return;
+      }
+      delete this.options.category3Id; // category3Id也要改
+      delete this.options.category2Id; // category2Id也要改
+      delete this.options.category1Id;
+      delete this.options[item];
+      this.getProductList(this.options);
+    },
+    addBrand(item) {
+      this.options.trademark = `${item.tmId}:${item.tmName}`;
+      this.getProductList();
+    },
+    deleteBrand() {
+      this.options.trademark = '';
+      this.getProductList();
     },
   },
   watch: {
