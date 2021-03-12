@@ -127,7 +127,7 @@
             </ul>
           </div>
           <div class="fr page">
-            <el-pagination
+            <!-- <el-pagination
               background
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
@@ -136,7 +136,14 @@
               :page-sizes="[5, 10, 15, 20]"
               layout="prev,pager,next,sizes,total"
               :total="total"
-            ></el-pagination>
+            ></el-pagination> -->
+
+            <Patination
+              :current-page="2"
+              :page-size="options.pageSize"
+              :total="20"
+              :page-count="7"
+            />
           </div>
         </div>
       </div>
@@ -147,6 +154,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import SearchSelector from './SearchSelector/SearchSelector';
+import Patination from '@/components/Pagination';
 
 export default {
   name: 'Search',
@@ -177,6 +185,7 @@ export default {
   },
   components: {
     SearchSelector,
+    Patination,
   },
   computed: {
     ...mapGetters(['goodsList', 'total']),
