@@ -32,6 +32,6 @@ export const reqGetGoodsList = (data) =>
 export const reqGetDetail = (params) =>
   request({
     method: 'GET',
-    url: '/item',
-    params,
+    url: `/item/${params}`,
+    // params,
   });

@@ -141,7 +141,7 @@
             <Patination
               :current-page="1"
               :page-size="options.pageSize"
-              :total="1"
+              :total="54"
               :page-count="7"
             />
           </div>

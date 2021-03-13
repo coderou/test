@@ -1,13 +1,15 @@
 <template>
   <div class="pagination">
     <button @click="changeMyCurrentPage(-1)">←</button>
-    <button @click="clickChange(1)">1</button>
+    <button @click="clickChange(1)" :class="{ active: myCurrentPage === 1 }">
+      1
+    </button>
     <button v-show="startEnd.start > 2">...</button>
 
     <!-- <button v-for="num in 10" :key="num">{{num}}</button> -->
     <!-- <template v-if="startEnd.end - startEnd.start > 0"> -->
     <button
-      class="active"
+      :class="{ active: num + startEnd.start - 1 === myCurrentPage }"
       v-for="num in middleBtnCount"
       :key="num"
       @click="clickChange(num + startEnd.start - 1)"
@@ -17,7 +19,11 @@
     <!-- </template> -->
 
     <button v-show="startEnd.end < totalPage - 1">...</button>
-    <button v-if="!totalPage === 1" @click="clickChange(totalPage)">
+    <button
+      v-if="totalPage !== 1"
+      :class="{ active: myCurrentPage === totalPage }"
+      @click="clickChange(totalPage)"
+    >
       {{ totalPage }}
     </button>
     <button @click="changeMyCurrentPage(1)">→</button>
