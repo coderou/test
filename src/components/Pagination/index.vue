@@ -47,9 +47,6 @@ export default {
     };
   },
   props: {
-    search: {
-      type: Function,
-    },
     'current-page': {
       // 定义属性时 a-b 命名，使用的时候可以使用小驼峰 aB
       // 当前页码
@@ -94,9 +91,18 @@ export default {
     },
   },
   watch: {
-    myPageSize() {
-      const totalPage = Math.ceil(this.total / this.myPageSize);
-      if (this.myCurrentPage > totalPage) { this.myCurrentPage = totalPage; }
+    myPageSize(pageSize) {
+      // const totalPage = Math.ceil(this.total / this.myPageSize);
+      // if (this.myCurrentPage > totalPage) { this.myCurrentPage = totalPage; }
+      // tip:结构出来有利于性能优化,因为多次读取操作也会消耗性能
+      const { myCurrentPage, totalPage } = this;
+      if (myCurrentPage > totalPage) {
+        this.myCurrentPage = totalPage;
+      }
+      this.$emit('size-change', pageSize);
+    },
+    myCurrentPage(myCurrentPage) {
+      this.$emit('current-change', myCurrentPage);
     },
   },
   computed: {
@@ -131,7 +137,6 @@ export default {
         end = totalPage - 1;
         start = end - middleBtnCount + 1;
       }
-      this.search();
       return {
         start,
         end,

@@ -119,4 +119,65 @@
   }
 3.props默认值是数组会报错,所以要写成函数形式,函数返回数组
 4.使用ctrl+.代替格式化
-5.
+5.tip:结构出来有利于性能优化,因为多次读取操作也会消耗性能
+6.watch用的都可以用computed来使用???
+7.computed不可以写异步操作??
+8._lodash使用防抖节流
+9.lodash函数:哪里要用,在那个函数包一层即可
+10.改变当前页,更新页面
+  tip:yarn add lodash
+  #view/Search/Search.vue
+  {
+    <template>
+      <Patination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="options.pageNo"
+        :page-size="options.pageSize"
+        :page-sizes="[5, 10, 15, 20]"
+        :total="total"
+        :page-count="7"
+      />
+    </template>
+    <script>
+      // import _ from 'lodash';// 完整引入,打包体积大
+      import debounce from 'lodash/debounce';// 单独引入
+      export default{
+        methods:{
+          //handleCurrentChange: _.debounce(function (currentPage) {
+          handleCurrentChange: debounce(function (currentPage) {
+            this.options.pageNo = currentPage;
+            this.search();
+          },
+          300,
+          {
+            // 让延迟开始前调用一次
+            leading: true,
+          }),
+        },
+      }
+    </script>
+  }
+  #components/Pagination/index.vue
+  {
+    <script>
+      export default{
+        watch:{
+          myPageSize(pageSize) {
+            // const totalPage = Math.ceil(this.total / this.myPageSize);
+            // if (this.myCurrentPage > totalPage) { this.myCurrentPage = totalPage; }
+            // tip:结构出来有利于性能优化,因为多次读取操作也会消耗性能
+            const { myCurrentPage, totalPage } = this;
+            if (myCurrentPage > totalPage) {
+              this.myCurrentPage = totalPage;
+            }
+            this.$emit('size-change', pageSize);
+          },
+          myCurrentPage(myCurrentPage) {
+            this.$emit('current-change', myCurrentPage);
+          },
+        }
+      }
+    </script>
+  }
+11.

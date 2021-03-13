@@ -139,11 +139,13 @@
             ></el-pagination> -->
 
             <Patination
-              :current-page="1"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="options.pageNo"
               :page-size="options.pageSize"
-              :total="54"
+              :page-sizes="[5, 10, 15, 20]"
+              :total="total"
               :page-count="7"
-              :search="search"
             />
           </div>
         </div>
@@ -154,6 +156,8 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+// import _ from 'lodash';// 完整引入,打包体积大
+import debounce from 'lodash/debounce';// 单独引入
 import Patination from '@/components/Pagination';
 import SearchSelector from './SearchSelector/SearchSelector';
 
@@ -200,11 +204,17 @@ export default {
   methods: {
     ...mapActions(['getGoodsList']),
     // element:改变当前是第几页
-    handleCurrentChange(currentPage) {
+    // 使用防抖优化函数性能(减少函数触发次数)
+    handleCurrentChange: debounce(function (currentPage) {
       this.options.pageNo = currentPage;
       this.search();
     },
-    // element:改变当前显示几页
+    300,
+    {
+      // 让延迟开始前调用一次
+      leading: true,
+    }),
+    // element:改变当前显示几条
     handleSizeChange(pageSize) {
       this.options.pageSize = pageSize;
       this.search();
