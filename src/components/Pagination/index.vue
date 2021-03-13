@@ -27,6 +27,11 @@
       {{ totalPage }}
     </button>
     <button @click="changeMyCurrentPage(1)">→</button>
+    <select v-model="myPageSize">
+      <option :value="size" v-for="size in pageSizes" :key="size"
+        >每页{{ size }}条</option
+      >
+    </select>
     <span class="pagination-total">总数:{{ total }}</span>
   </div>
 </template>
@@ -38,6 +43,7 @@ export default {
     return {
       // 目的:props是只读的
       myCurrentPage: this.currentPage,
+      myPageSize: this.pageSize,
     };
   },
   props: {
@@ -51,6 +57,10 @@ export default {
     'page-size': {
       type: Number,
       default: 5,
+    },
+    'page-sizes': {
+      type: Array,
+      default: () => [5, 10, 15, 20],
     },
     // 总数
     total: {
@@ -80,6 +90,12 @@ export default {
       this.myCurrentPage = num;
     },
   },
+  watch: {
+    myPageSize() {
+      const totalPage = Math.ceil(this.total / this.myPageSize);
+      if (this.myCurrentPage > totalPage) { this.myCurrentPage = totalPage; }
+    },
+  },
   computed: {
     // 中间显示按钮的数量
     middleBtnCount() {
@@ -88,12 +104,12 @@ export default {
     },
     // 总页数(total/每页条数)
     totalPage() {
-      return Math.ceil(this.total / this.pageSize);
+      return Math.ceil(this.total / this.myPageSize);
     },
     // 计算中间按钮 -开始到结束坐标
     startEnd() {
       const { pageCount, myCurrentPage, totalPage } = this;
-      console.log(pageCount, myCurrentPage, totalPage);
+      // console.log(pageCount, myCurrentPage, totalPage);
       if (totalPage <= pageCount) {
         const start = 2;
         const end = totalPage - 1;

@@ -39,13 +39,26 @@
         {{ totalPage }}
       </button>
       <button @click="changeMyCurrentPage(1)">👉</button>
+      <select v-model="myPageSize">
+        <option :value="size" v-for="size in pageSizes" :key="size"
+          >每页{{ size }}条</option
+        >
+      </select>
+      <span class="pagination-total">总数:{{ total }}</span>
     </template>
     <script>
       export default{
         data(){
           return{
             myCurrentPage: this.currentPage,
+            myPageSize: this.pageSize,
           }
+        },
+        props:{
+          'page-sizes': {
+            type: Array,
+            default: () => [5, 10, 15, 20],
+          },
         },
         computed:{
           middleBtnCount(){
@@ -53,7 +66,7 @@
             return num<0?:0:num
           },
           totalPage() {
-            return Math.ceil(this.total / this.pageSize);
+            return Math.ceil(this.total / this.myPageSize);
           },
           startEnd(){
             const {} =this;
@@ -89,11 +102,20 @@
               this.myCurrentPage -= 1;
             }
           },
+          // 只有一行代码,可以直接赋值
           clickChange(num) {
             this.myCurrentPage = num;
           },
-        }
+        },
+        watch: {
+          myPageSize() {
+            const totalPage = Math.ceil(this.total / this.myPageSize);
+            if (this.myCurrentPage > totalPage) { this.myCurrentPage = totalPage; }
+          },
+        },
+
       };
     </script>
   }
-3.
+3.props默认值是数组会报错,所以要写成函数形式,函数返回数组
+4.
