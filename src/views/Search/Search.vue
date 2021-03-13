@@ -143,6 +143,7 @@
               :page-size="options.pageSize"
               :total="54"
               :page-count="7"
+              :search="search"
             />
           </div>
         </div>

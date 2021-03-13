@@ -47,6 +47,9 @@ export default {
     };
   },
   props: {
+    search: {
+      type: Function,
+    },
     'current-page': {
       // 定义属性时 a-b 命名，使用的时候可以使用小驼峰 aB
       // 当前页码
@@ -128,6 +131,7 @@ export default {
         end = totalPage - 1;
         start = end - middleBtnCount + 1;
       }
+      this.search();
       return {
         start,
         end,
