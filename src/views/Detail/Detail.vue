@@ -371,15 +371,19 @@ export default {
     Zoom,
   },
   computed: {
-    ...mapState(['good']),
+    ...mapState({
+      good: (state) => state.detail.good,
+    }),
   },
   methods: {
     ...mapActions(['getDetail']),
   },
   mounted() {
-    this.getDetail();
-    console.log(this.$route.params);
-    console.log(this.good);
+    const { skuId } = this.$route.params;
+    this.getDetail(skuId);
+    setTimeout(() => {
+      console.log(this.good);
+    }, 1000);
   },
 };
 </script>

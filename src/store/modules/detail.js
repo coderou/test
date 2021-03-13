@@ -7,6 +7,7 @@ export const state = {
 export const getters = {};
 export const actions = {
   getDetail({ commit }, id) {
+    console.log(id);
     reqGetDetail(id)
       .then((searchList) => {
         commit('REQ_GET_DETAIL', searchList);
