@@ -139,9 +139,9 @@
             ></el-pagination> -->
 
             <Patination
-              :current-page="2"
+              :current-page="1"
               :page-size="options.pageSize"
-              :total="20"
+              :total="54"
               :page-count="7"
             />
           </div>
@@ -153,8 +153,8 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import SearchSelector from './SearchSelector/SearchSelector';
 import Patination from '@/components/Pagination';
+import SearchSelector from './SearchSelector/SearchSelector';
 
 export default {
   name: 'Search',

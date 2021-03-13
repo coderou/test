@@ -1,0 +1,74 @@
+1.复习:
+  1.点击三级导航搜索功能:改变地址,监视$route的改变,发送请求
+  2.监视$route变化->调用search()->search方法中通过data的options发送请求
+  3.点击trademark商标,将数据更新options,通过search发送请求
+  4.search函数通过props传递给子组件[还可以用自定义事件]
+  5.props数据结构:id:value:key
+  6.当点击prop,将属性push进去props[]
+    判断:新添加的props是否已经存在了
+    if(newOptions.props){
+      if(props.indexOf(newProp)!==-1)return
+      判断:要添加prop,且prop之前没有添加过
+      props.push(newProp)
+    }
+  7.升序降序
+    order字段数据结构:1:desc  2:asc等,默认值是1:desc
+2.初步实现分页器功能:
+  #components/Pagination/index.vue
+  {
+    <template>
+      <button @click="myCurrentPage--">👈</button>
+      <button>1</button> 
+      <button>...</button> 
+      <button 
+        v-for="num in middleBtnCount" 
+        :key="num"
+      >
+        {{num+startEnd.start-1}}
+      </button> 
+      <button>...</button> 
+      <button>{{totalPage}}</button> 
+      <button @click="myCurrentPage++">👉</button>
+    </template>
+    <script>
+      export default{
+        data(){
+          return{
+            myCurrentPage: this.currentPage,
+          }
+        },
+        computed:{
+          middleBtnCount(){
+            const num=this.startEnd.end-this.startEnd.start+1
+            return num<0?:0:num
+          },
+          totalPage() {
+            return Math.ceil(this.total / this.pageSize);
+          },
+          startEnd(){
+            const {} =this;
+            // 如果总按钮数量(计算结果),小于按钮数量(7)
+            if(totalPage<=pageCount){
+              const start=2;
+              const end=totalPage-1;
+              return{start,end};
+            }
+            // 正常情况
+            const middleBtnCount = pageCount - 2;
+            const halfMiddleBtnCount = Math.floor(middleBtnCount / 2);
+
+            let start = myCurrentPage - halfMiddleBtnCount;
+            // 特殊情况1(start计算结果小于了最小值)
+            if (start < 2) { start = 2; }
+            let end = start + middleBtnCount - 1;
+            // 特殊情况2(end计算结果大于了最大值)
+            if (end >= totalPage) {
+              end = totalPage - 1;
+              start = end - middleBtnCount + 1;
+            }
+            return {start,end};
+          }
+        }
+      };
+    </script>
+  }
