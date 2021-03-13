@@ -1,7 +1,7 @@
 <template>
   <div class="pagination">
     <button @click="changeMyCurrentPage(-1)">←</button>
-    <button>1</button>
+    <button @click="clickChange(1)">1</button>
     <button v-show="startEnd.start > 2">...</button>
 
     <!-- <button v-for="num in 10" :key="num">{{num}}</button> -->
@@ -16,8 +16,10 @@
     </button>
     <!-- </template> -->
 
-    <button v-show="startEnd.end < totalPage-1">...</button>
-    <button>{{ totalPage }}</button>
+    <button v-show="startEnd.end < totalPage - 1">...</button>
+    <button v-if="!totalPage === 1" @click="clickChange(totalPage)">
+      {{ totalPage }}
+    </button>
     <button @click="changeMyCurrentPage(1)">→</button>
     <span class="pagination-total">总数:{{ total }}</span>
   </div>
