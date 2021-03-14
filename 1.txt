@@ -410,9 +410,23 @@
     现在,他们已包括如推送通知和后台同步等功能.将来,Service Worker将会支持如定期同步或地理围栏等其他功能,
   6.数组扁平化:
     arr.flat(infinity)
-    function flat(arr){
-      
+    function flat(arr) {
+      let res = [];
+      function fn(_arr) {
+        _arr.forEach((i) => {
+          if (!Array.isArray(i)) {
+            res.push(i);
+          } else {
+            fn(i);
+          }
+        });
+      }
+      fn(arr);
+      return res;
     }
+    let res = flat([1, 2, [3, 4, [5, 6], 7], 8,[2,3,[3,[4]]], [9]]);
+    console.log(res);
+  7.chunk
 13.
 
 
