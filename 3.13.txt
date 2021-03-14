@@ -195,7 +195,134 @@
   6.
 4.sku/spu
 5.2021年3月13日16:50:02
-🌌🚩🚩🚩🚩🚩6.既然都可以通过TS进行编译JS,那为什么不可以将中文编译为英文执行??
+🍟🍟6.既然都可以通过TS进行编译JS,那为什么不可以将中文变量名编译为英文执行??
 2021年3月13日16:57:34
 7.PC项目写的时候，能自己写一般都是自己写，不会用第三方库
-8.
+8.实现商品详情页渲染数据
+  #router/routes.js
+  {
+    import Detail from '@/views/Detail/Detail.vue'
+    export default{
+      {
+        path:'detail/:skuId?',
+        name:'Detail',
+        component:Detail,
+      }
+    }
+  }
+  #router/index.js
+  {
+    export default new VueRouter({
+      ...
+      scrollBehavior() {
+        // return 期望滚动到那个的位置
+        return {
+          x: 0,
+          y: 0,
+        };
+      },
+    })
+  }
+  #api/index.js
+  {
+    export const reqGetDetail=(id)=>{
+      request({
+        method:'GET',
+        url:`/item/${id}`,
+      })
+    }
+  }
+  #store/modules/detail.js
+  {
+    import { reqGetDetail } from '@/api';
+
+    export const state = {
+      // 建议:初始化数据时详细
+      // 商品详情数据
+      goodsDetail: {
+        // 商品分类
+        categoryView: {},
+        // 商品详情数据
+        skuInfo: {},
+        // 商品销售属性值列表
+        spuSaleAttrList: [],
+      },
+    };
+
+    export const getters = {
+      categoryView(state) {
+        return state.goodsDetail.categoryView;
+      },
+      skuInfo(state) {
+        return state.goodsDetail.skuInfo;
+      },
+      spuSaleAttrList(state) {
+        return state.goodsDetail.spuSaleAttrList;
+      },
+    };
+
+    export const actions = {
+      getDetail({ commit }, id) {
+        // console.log(id);
+        reqGetDetail(id)
+          .then((searchList) => {
+            commit('REQ_GET_DETAIL', searchList);
+          })
+          .catch((message) => {
+            console.log(message);
+          });
+      },
+    };
+
+    export const mutations = {
+      REQ_GET_DETAIL(state, goodsDetail) {
+        state.goodsDetail = goodsDetail;
+      },
+    };
+  }
+  #store/modules/index.js
+  {
+    import * as detail from './detail.js'
+  }
+  #views/Search/Search.vue
+  {
+    <div class="p-img">
+      <router-link :to="`/detail/${goods.id}`"
+        ><img :src="goods.defaultImg"
+      /></router-link>
+    </div>
+  }
+  #views/Detail/Detail.vue
+  {
+    <template>
+      .....
+        <dl v-for="spuSaleAttr in spuSaleAttrList" :key="spuSaleAttr.id">
+          <dt class="title">{{ spuSaleAttr.saleAttrName }}</dt>
+          <dd
+            v-for="spuSaleAttrValue in spuSaleAttr.spuSaleAttrValueList"
+            :class="{
+              active: spuSaleAttrValue.isChecked === '1',
+            }"
+            :key="spuSaleAttrValue.id"
+          >
+            {{ spuSaleAttrValue.saleAttrValueName }}
+          </dd>
+        </dl>
+      .....
+    </template>
+    <script>
+      import { mapGetters, mapActions } from 'vuex';
+      export default{
+        computed:{
+          ...mapGetters(['categoryView", "skuInfo", "spuSaleAttrList'])
+        },
+        methods:{
+          ...mapActions(['getDetail'])
+        },
+        mounted(){
+          const {skuId} = this.$route.params;
+          this.getDetail(skuId)
+        }
+      };
+    </script>
+  }

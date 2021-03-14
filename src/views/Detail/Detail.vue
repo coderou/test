@@ -1,16 +1,15 @@
 <template>
   <div class="detail">
     <!-- 商品分类导航 -->
+  <button @click="show">按钮</button>
     <TypeNav />
-
     <!-- 主要内容区域 -->
     <section class="con">
       <!-- 导航路径区域 -->
       <div class="conPoin">
-        <span>手机、数码、通讯</span>
-        <span>手机</span>
-        <span>Apple苹果</span>
-        <span>iphone 6S系类</span>
+        <span>{{ categoryView.category1Name }}</span>
+        <span>{{ categoryView.category2Name }}</span>
+        <span>{{ categoryView.category3Name }}</span>
       </div>
       <!-- 主要内容区域 -->
       <div class="mainCon">
@@ -25,10 +24,10 @@
         <div class="InfoWrap">
           <div class="goodsDetail">
             <h3 class="InfoName">
-              Apple iPhone 6s（A1700）64G玫瑰金色 移动通信电信4G手机
+              {{ skuInfo.skuName }}
             </h3>
             <p class="news">
-              推荐选择下方[移动优惠购],手机套餐齐搞定,不用换号,每月还有花费返
+              {{ skuInfo.skuDesc }}
             </p>
             <div class="priceArea">
               <div class="priceArea1">
@@ -37,7 +36,7 @@
                 </div>
                 <div class="price">
                   <i>¥</i>
-                  <em>5299</em>
+                  <em>{{ skuInfo.price }}</em>
                   <span>降价通知</span>
                 </div>
                 <div class="remark">
@@ -76,34 +75,22 @@
           <div class="choose">
             <div class="chooseArea">
               <div class="choosed"></div>
-              <dl>
-                <dt class="title">选择颜色</dt>
-                <dd changepirce="0" class="active">金色</dd>
-                <dd changepirce="40">银色</dd>
-                <dd changepirce="90">黑色</dd>
-              </dl>
-              <dl>
-                <dt class="title">内存容量</dt>
-                <dd changepirce="0" class="active">16G</dd>
-                <dd changepirce="300">64G</dd>
-                <dd changepirce="900">128G</dd>
-                <dd changepirce="1300">256G</dd>
-              </dl>
-              <dl>
-                <dt class="title">选择版本</dt>
-                <dd changepirce="0" class="active">公开版</dd>
-                <dd changepirce="-1000">移动版</dd>
-              </dl>
-              <dl>
-                <dt class="title">购买方式</dt>
-                <dd changepirce="0" class="active">官方标配</dd>
-                <dd changepirce="-240">优惠移动版</dd>
-                <dd changepirce="-390">电信优惠版</dd>
+              <dl v-for="spuSaleAttr in spuSaleAttrList" :key="spuSaleAttr.id">
+                <dt class="title">{{ spuSaleAttr.saleAttrName }}</dt>
+                <dd
+                  v-for="spuSaleAttrValue in spuSaleAttr.spuSaleAttrValueList"
+                  :class="{
+                    active: spuSaleAttrValue.isChecked === '1',
+                  }"
+                  :key="spuSaleAttrValue.id"
+                >
+                  {{ spuSaleAttrValue.saleAttrValueName }}
+                </dd>
               </dl>
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt" />
+                <input autocomplete="off" class="itxt" value="1" />
                 <a href="javascript:" class="plus">+</a>
                 <a href="javascript:" class="mins">-</a>
               </div>
@@ -279,9 +266,7 @@
             </ul>
             <div class="result">
               <div class="num">已选购0件商品</div>
-              <div class="price-tit">
-                套餐价
-              </div>
+              <div class="price-tit">套餐价</div>
               <div class="price">￥5299</div>
               <button class="addshopcar">加入购物车</button>
             </div>
@@ -290,29 +275,19 @@
         <div class="intro">
           <ul class="tab-wraped">
             <li class="active">
-              <a href="###">
-                商品介绍
-              </a>
+              <a href="###"> 商品介绍 </a>
             </li>
             <li>
-              <a href="###">
-                规格与包装
-              </a>
+              <a href="###"> 规格与包装 </a>
             </li>
             <li>
-              <a href="###">
-                售后保障
-              </a>
+              <a href="###"> 售后保障 </a>
             </li>
             <li>
-              <a href="###">
-                商品评价
-              </a>
+              <a href="###"> 商品评价 </a>
             </li>
             <li>
-              <a href="###">
-                手机社区
-              </a>
+              <a href="###"> 手机社区 </a>
             </li>
           </ul>
           <div class="tab-content">
@@ -359,31 +334,34 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import ImageList from './ImageList/ImageList';
 import Zoom from './Zoom/Zoom';
 
 export default {
   name: 'Detail',
-
   components: {
     ImageList,
     Zoom,
   },
   computed: {
-    ...mapState({
-      good: (state) => state.detail.good,
-    }),
+    // ...mapState({
+    //   good: (state) => state.detail.good,
+    // }),
+    ...mapGetters(["categoryView", "skuInfo", "spuSaleAttrList"]),
   },
   methods: {
     ...mapActions(['getDetail']),
+    show() {
+      console.log(this.categoryView);
+    },
   },
   mounted() {
+    // 请求商品详情数据
     const { skuId } = this.$route.params;
     this.getDetail(skuId);
-    setTimeout(() => {
-      console.log(this.good);
-    }, 1000);
+    console.log(this.state);
+    // console.log(this.good);
   },
 };
 </script>

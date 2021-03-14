@@ -93,7 +93,7 @@
                 <div class="list-wrap">
                   <div class="p-img">
                     <!-- :to="{path:'/Detail/',params:{skuId:goods.id},}" -->
-                    <router-link :to="`/detail/${goods.id}`" target="_blank"
+                    <router-link :to="`/detail/${goods.id}`"
                       ><img :src="goods.defaultImg"
                     /></router-link>
                   </div>

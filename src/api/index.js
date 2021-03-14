@@ -29,9 +29,9 @@ export const reqGetGoodsList = (data) =>
     url: '/list',
     data,
   });
-export const reqGetDetail = (params) =>
+export const reqGetDetail = (id) =>
   request({
     method: 'GET',
-    url: `/item/${params}`,
-    // params,
+    url: `/item/${id}`,
+    // params,// 不是这么写的,params在这里axios中是查询字符串,不是路由参数
   });
