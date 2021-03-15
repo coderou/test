@@ -53,7 +53,7 @@ export default {
       this.currentIndex = index;
       this.$bus.$emit('receive_imgs', {
         imgUrl: this.skuImageList[index].imgUrl,
-        bigUrl: this.skuImageList[index.imgUrl], // 将来大图不一样,就要换一个容器
+        bigUrl: this.skuImageList[index].imgUrl, // 将来大图不一样,就要换一个容器
       });
     },
   },
