@@ -554,4 +554,5 @@
     </script>
   }
 14.tip:鼠标移动到异步函数上面,可以将其转换为异步函数async
-15.
+15.tip:引入模块的时候,路径名后面不能多空格,否则报错This relative module was not found
+16.
