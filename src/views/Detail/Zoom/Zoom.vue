@@ -2,7 +2,7 @@
   <div class="spec-preview">
     <!-- <img :src="skuImageList[0].imgUrl" /> -->
     <img :src="imgUrl" />
-    <div ref="event" class="event" @mousemove="show"></div>
+    <div ref="event" class="event" @mousemove="zoom"></div>
     <div ref="mask" class="mask"></div>
 
     <div class="big">
@@ -29,7 +29,7 @@ export default {
     ...mapGetters(['skuImageList']),
   },
   methods: {
-    show: throttle(function (e) {
+    zoom: throttle(function (e) {
       const { mask, bigImg } = this.$refs;
       /*
         offsetX:e事件距离该元素边缘的位置
@@ -50,8 +50,8 @@ export default {
       mask.style.top = `${maskPosition.y}px`;
       // 大图位置
       const bigImgPosition = {
-        x: -maskX * 2,
-        y: -maskY * 2,
+        x: -maskPosition.x * 2,
+        y: -maskPosition.y * 2,
       };
       bigImg.style.left = `${bigImgPosition.x}px`;
       bigImg.style.top = `${bigImgPosition.y}px`;
