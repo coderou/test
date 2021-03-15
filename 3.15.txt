@@ -359,4 +359,197 @@
   2.并且方便以后维护
   3.如果是当前组件使用的,那么直接封装在内部即可
   4.并且能快速定位到到底那个组件出现问题
-12.
+12.下午:加入购物车
+  1.事件总线使用注意点:2个通信的组件必须加载好
+  2.前端主要负责的就是数据显示,本质上用户适用App是在和后台进行交互
+  3.tip:添加购物车和修改购物车数量都是同一个接口
+13.添加购物车
+  #api/shopcart.js
+  {
+    import request from './request';
+    const PREFIX_URL = '/cart';
+    // 获取购物车列表
+    export const reqGetCartList = () =>
+      request({
+        method: 'GET',
+        url: `${PREFIX_URL}cartList`,
+      });
+    // 添加购物车
+    export const reqAddCartList = (skuId, skuNum) =>
+      request({
+        method: 'GET',
+        url: `${PREFIX_URL}addToCart/${skuId}/${skuNum}`,
+      });
+    // 更新商品选中状态
+    export const reqUpdateCartList = (skuId, isChecked) =>
+      request({
+        // 这里是修改,理论上应该是POST
+        method: 'GET',
+        url: `${PREFIX_URL}checkCart/${skuId}/${isChecked}`,
+      });
+    // 删除商品
+    export const reqDeleteCartList = (skuId) =>
+      request({
+        // 这里是修改,理论上应该是POST
+        method: 'DELETE',
+        url: `${PREFIX_URL}deleteCart/${skuId}`,
+      });
+  }
+  #store/modules/shopcart.js
+  {
+    import {
+      reqGetCartList,
+      reqAddCartList,
+      // reqUpdateCartList,
+      // reqDeleteCartList,
+    } from '@/api/shopcart';
+    export const state = {
+      cartList: [],
+    };
+    export const getters = {};
+    export const actions = {
+      getCartList({ commit }) {
+        return reqGetCartList()
+          .then((cartList) => {
+            commit('GET_CART_LIST', cartList);
+          })
+          .catch((message) => {
+            console.log(message);
+          });
+      },
+
+      addCartList({ commit }, { skuId, skuNum }) {
+        // reqGetCartList函数返回一个promise,默认成功promise
+        // 只有函数内部报错了,会返回失败的promise
+        // 或者是内部返回一个promise,那么整个函数返回的promise就是返回的这个promise,而不是默认的
+        return reqAddCartList(skuId, skuNum).then(() => {
+          // 外面是一个promise,里面也是一个promise,
+          // 如果不设置返回值,默认返回一个成功的promise,如果返回的是新promise,
+          // 外面的promise由内部promise决定
+          // tip:将函数返回出去,让外面判断这个成功状态
+          commit('ADD_CART_LIST');
+          // .catch((message) => { //如果不写,就会在调用action的地方进行处理
+          //   console.log(message);
+          // })
+          // .then(() => {}) // 成功/失败都会触发,只要是没有报错,没有返回promise,都会触发
+        });
+      },
+    };
+    export const mutations = {
+      GET_CART_LIST(state, cartList) {
+        state.cartList = cartList;
+      },
+      ADD_CART_LIST() {},
+    };
+  }
+  #store/modules/index.js
+  {
+    import * as shopcart from './shopcart ';
+    export default{
+      shopcart,
+    }
+  }
+  #views/Detail/Detail.vue
+  tip:
+    调用action函数返回值是一个promise对象,如果内部是发送请求,可以将请求return出去,在外面进行处理
+  面试:
+    怎么等添加成功后,在这里处理成功\失败的情况? 
+    在内部将发送请求的promise返回出来
+  {
+    <template>
+      <InputNumber v-model="num" />
+      <div class="add" @click="addCart">
+        <a href="javascript:">加入购物车</a>
+      </div>
+    </template>
+    <script>
+      export default{
+        methods:{
+          ...mapActions(['addCartList']),
+          async addCart() {
+            // 1.发送请求,更新购物车数据
+            /*
+              tip:
+                调用action函数返回值是一个promise对象
+              面试:
+                怎么等添加成功后,在这里处理成功\失败的情况? 
+                在内部将发送请求的promise返回出来
+            */
+            // const res = await this.addCartList({ skuId: this.skuInfo.id, skuNum: this.num });
+            // console.log(res) // 是一个promise对象,注意:acitons内部包含了2个promsie请求,外层是这里的,内层才是真正发送请求
+            // this.addCartList({
+            //   skuId: this.skuInfo.id,
+            //   skuNum: this.num,
+            // })
+            //   // 请求成功==功能成功(因为设置了拦截器)
+            //   .then(() => {})
+            //   // 功能失败
+            //   .catch((message) => {});
+
+            try {
+              await this.addCartList({
+                skuId: this.skuInfo.id,
+                skuNum: this.num,
+              });
+              // 2.请求成功,存储数据到sessionStorage中(会话存储)
+              const { skuName, skuDesc, skuDefaultImg, price } = this.skuInfo;
+
+              // #region
+              /* 
+              "spuSaleAttrList": [
+                {
+                  "id": 1,
+                  "spuId": 1,
+                  "baseSaleAttrId": 1,
+                  "saleAttrName": "选择颜色",
+                  "spuSaleAttrValueList": [
+                    {
+                      "id": 1,
+                      "spuId": 1,
+                      "baseSaleAttrId": 1,
+                      "saleAttrValueName": "黑色",
+                      "saleAttrName": "选择颜色",
+                      "isChecked": "0"
+                    },
+                    …
+                  ]
+                },
+              */
+              // #endregion
+
+              const saleAttrList = this.spuSaleAttrList.map((saleAttrValue) => ({
+                // id
+                id: saleAttrValue.id,
+                // 销售属性名称
+                saleAttrName: saleAttrValue.saleAttrName,
+                // 销售属性选中你的值(其他值不变)
+                saleAttrValueName: saleAttrValue.spuSaleAttrValueList.find(
+                  (saleAttr) => saleAttr.isChecked === '1',
+                ).saleAttrValueName,
+              }));
+              // 3.储存会话数据
+              window.sessionStorage.setItem(
+                'cart',
+                JSON.stringify({
+                  skuName,
+                  skuDesc,
+                  skuDefaultImg,
+                  price,
+                  saleAttrList,
+                }),
+              );
+              // 4.跳转到添加购物车成功页面
+              this.$router.history.push({
+                path: '/addcartsuccess',
+                query: {
+                  skuNum: this.num,
+                },
+              });
+            } catch (e) {
+              console.error(e);
+            }
+          },
+        },
+      }
+    </script>
+  }

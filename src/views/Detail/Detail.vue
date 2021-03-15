@@ -105,7 +105,7 @@
                         和一个自定义事件input
                -->
               <InputNumber v-model="num" />
-              <div class="add">
+              <div class="add" @click="addCart">
                 <a href="javascript:">加入购物车</a>
               </div>
             </div>
@@ -369,12 +369,96 @@ export default {
     ...mapGetters(['categoryView', 'skuInfo', 'spuSaleAttrList']),
   },
   methods: {
-    ...mapActions(['getDetail']),
+    ...mapActions(['getDetail', 'addCartList']),
     // 这里是利用vue响应式的特点,react中就要真的遍历了
     setChecked(saleAttrValue, saleAttrValueList) {
       // eslint-disable-next-line no-return-assign
       saleAttrValueList.forEach((value) => (value.isChecked = '0'));
       saleAttrValue.isChecked = '1';
+    },
+    async addCart() {
+      // 1.发送请求,更新购物车数据
+      /*
+        tip:
+          调用action函数返回值是一个promise对象
+        面试:
+          怎么等添加成功后,在这里处理成功\失败的情况? 
+          在内部将发送请求的promise返回出来
+      */
+      // const res = await this.addCartList({ skuId: this.skuInfo.id, skuNum: this.num });
+      // console.log(res) // 是一个promise对象,注意:acitons内部包含了2个promsie请求,外层是这里的,内层才是真正发送请求
+      // this.addCartList({
+      //   skuId: this.skuInfo.id,
+      //   skuNum: this.num,
+      // })
+      //   // 请求成功==功能成功(因为设置了拦截器)
+      //   .then(() => {})
+      //   // 功能失败
+      //   .catch((message) => {});
+
+      try {
+        await this.addCartList({
+          skuId: this.skuInfo.id,
+          skuNum: this.num,
+        });
+        // 2.请求成功,存储数据到sessionStorage中(会话存储)
+        // eslint-disable-next-line
+        const { skuName, skuDesc, skuDefaultImg, price } = this.skuInfo;
+
+        // #region
+        /* 
+        "spuSaleAttrList": [
+          {
+            "id": 1,
+            "spuId": 1,
+            "baseSaleAttrId": 1,
+            "saleAttrName": "选择颜色",
+            "spuSaleAttrValueList": [
+              {
+                "id": 1,
+                "spuId": 1,
+                "baseSaleAttrId": 1,
+                "saleAttrValueName": "黑色",
+                "saleAttrName": "选择颜色",
+                "isChecked": "0"
+              },
+              …
+            ]
+          },
+        */
+        // #endregion
+
+        const saleAttrList = this.spuSaleAttrList.map((saleAttrValue) => ({
+          // id
+          id: saleAttrValue.id,
+          // 销售属性名称
+          saleAttrName: saleAttrValue.saleAttrName,
+          // 销售属性选中你的值(其他值不变)
+          saleAttrValueName: saleAttrValue.spuSaleAttrValueList.find(
+            (saleAttr) => saleAttr.isChecked === '1',
+          ).saleAttrValueName,
+        }));
+        // 3.储存会话数据
+        window.sessionStorage.setItem(
+          'cart',
+          JSON.stringify({
+            skuName,
+            skuDesc,
+            skuDefaultImg,
+            price,
+            saleAttrList,
+          }),
+        );
+        // 4.跳转到添加购物车成功页面
+        this.$router.history.push({
+          path: '/addcartsuccess',
+          query: {
+            skuNum: this.num,
+          },
+        });
+      } catch (e) {
+        console.error(e);
+      }
     },
   },
   mounted() {
