@@ -13,6 +13,7 @@
 import axios from 'axios';
 import NProgress from 'nprogress'; // 引入JS
 import 'nprogress/nprogress.css'; // 引入css
+import getUuid from '@/utils/uuid';
 
 const errorMessages = {
   401: '未授权',
@@ -28,6 +29,8 @@ const request = axios.create({
 
 request.interceptors.request.use((config) => {
   NProgress.start();
+  // 设置公共请求数据
+  config.headers.userTempId = getUuid();// ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
   return config;
 });
 

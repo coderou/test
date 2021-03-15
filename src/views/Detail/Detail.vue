@@ -406,7 +406,7 @@ export default {
         });
         // 2.请求成功,存储数据到sessionStorage中(会话存储)
         // eslint-disable-next-line
-        const { skuName, skuDesc, skuDefaultImg, price } = this.skuInfo;
+        const { skuName, skuDesc, skuDefaultImg, price,id } = this.skuInfo;
         // #region
         /*
         "spuSaleAttrList": [
@@ -449,6 +449,7 @@ export default {
             skuDefaultImg,
             price,
             saleAttrList,
+            id,
           }),
         );
         // 4.跳转到添加购物车成功页面

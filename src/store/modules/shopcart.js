@@ -16,7 +16,7 @@ export const actions = {
   getCartList({ commit }) {
     return reqGetCartList()
       .then((cartList) => {
-        commit('GET_CART_LIST', cartList);
+        commit('GET_CART_LIST', cartList[0].cartInfoList);
       })
       .catch((message) => {
         console.log(message);

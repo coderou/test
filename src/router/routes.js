@@ -3,6 +3,8 @@ import Search from '@/views/Search/Search.vue';
 import Register from '@/views/Register/Register.vue';
 import Login from '@/views/Login/Login.vue';
 import Detail from '@/views/Detail/Detail.vue';
+import AddCartSuccess from '@/views/AddCartSuccess/AddCartSuccess.vue';
+import ShopCart from '@/views/ShopCart/ShopCart.vue';
 
 export default [
   {
@@ -37,8 +39,18 @@ export default [
     component: Search,
   },
   {
-    path: '/detail/:skuId?',
+    path: '/detail/:skuId',
     name: 'Detail',
     component: Detail,
+  },
+  {
+    path: '/addcartsuccess/',
+    name: 'AddCartSuccess',
+    component: AddCartSuccess,
+  },
+  {
+    path: '/shopcart',
+    name: 'ShopCart',
+    component: ShopCart,
   },
 ];

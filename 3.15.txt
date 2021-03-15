@@ -411,7 +411,7 @@
       getCartList({ commit }) {
         return reqGetCartList()
           .then((cartList) => {
-            commit('GET_CART_LIST', cartList);
+            commit('GET_CART_LIST', cartList[0].cartInfoList);
           })
           .catch((message) => {
             console.log(message);
@@ -492,7 +492,7 @@
                 skuNum: this.num,
               });
               // 2.请求成功,存储数据到sessionStorage中(会话存储)
-              const { skuName, skuDesc, skuDefaultImg, price } = this.skuInfo;
+              const { skuName, skuDesc, skuDefaultImg, price,id } = this.skuInfo;
 
               // #region
               /* 
@@ -536,6 +536,7 @@
                   skuDefaultImg,
                   price,
                   saleAttrList,
+                  id
                 }),
               );
               // 4.跳转到添加购物车成功页面
@@ -553,6 +554,160 @@
       }
     </script>
   }
-14.tip:鼠标移动到异步函数上面,可以将其转换为异步函数async
+14.tip:鼠标移动到异步函数上面,可以将其转换为异步函数async(慎用)
 15.tip:引入模块的时候,路径名后面不能多空格,否则报错This relative module was not found
-16.
+16.添加购物车步骤分析
+  1.拿到静态组件:AddCartSuccess\ShopCart
+  2.配置routes
+  3.AddCartSuccess.vue进行数据展示
+    data中拿sessionStorage的数据[tip:记得JSON.parse]
+    动态显示数据
+    判断cart有没有值,如果没有值,就跳转到shopCart.vue
+    完善AddCartSuccess的各种链接
+  4.完善购物车[购物车未登录无法获取数据,需要临时token或者用户登录]
+    定义uuid的util工具库,在request使用
+  5.shopCart展示数据
+17.谷歌输入法,屏下指纹降低使用流畅度
+18.2021年3月15日16:21:21
+19.es6和commonjs的重命名
+  {
+    import {v4 as uuidv4} from 'uuid';//es module语法
+    const {v4:uuidv4} =require('uuid')//解构复制语法
+    const x={a:{b:{c:1}}}
+    const {a:{b:{c}}}=x // 冒号表示解构
+    console.log(a,b) // 报错
+    console.log(c) // 只能用最后一层
+
+    const {a:{b:{c:d}}}=x // 冒号表示解构
+    console.log(d) // 通常用于只提取对象中的某一个数据
+  }
+20.tip:当找库的时候,永远推荐去npm上去找
+21.tip:登录账号token一般是保存一段时间就会改变[token是会失效的,服务器刷新]
+22.开发:想要的数据就是某个,但是受到的数据一大堆,所以需要自己整理数据
+23.添加购物车
+  #安装uuid.js
+  {
+    yarn add uuid
+  }
+  #router/routes.js
+  {
+    import AddCartSuccess from '@/views/AddCartSuccess/AddCartSuccess.vue';
+    import ShopCart from '@/views/ShopCart/ShopCart.vue';
+
+    export default[
+       {
+        path: '/addcartsuccess/',
+        name: 'AddCartSuccess',
+        component: AddCartSuccess,
+      },
+      {
+        path: '/shopcart',
+        name: 'ShopCart',
+        component: ShopCart,
+      },
+    ];
+  }
+  #utils/uuid.js
+  {
+    import {v4 as uuidv4} from 'uuid';
+
+    let uuid=window.localStorage.getItem('uuid');
+    export default function getUuid(){
+      // 1.如果之前保存过,直接使用,返回
+      if(uuid) return uuid;
+      // 2.没有保存过,生成一个新的
+      uuid=uuidv4();
+      window.localStorage.setItrm('uuid',uuid);
+      return uuid
+    }
+  }
+  #api/request.js
+  {
+    import getUuid from '@/utils/uuid';
+
+    request.interceptors.request.use((config) => {
+      NProgress.start();
+      // 设置公共请求数据
+      config.headers.userTempId = getUuid();// ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
+      return config;
+    });
+  }
+  #views/AddCartSuccess/AddCartSuccess.vue
+  {
+    <template>
+      <div class="goods">
+        <div class="left-good">
+          <div class="left-pic">
+            <img :src="cart.skuDefaultImg" />
+          </div>
+          <div class="right-info">
+            <p class="title">
+              {{ cart.skuName }}
+            </p>
+            <p
+              class="attr"
+              v-for="saleAttr in cart.saleAttrList"
+              :key="saleAttr.id"
+            >
+              {{ saleAttr.saleAttrName }}:{{ saleAttr.saleAttrValueName }}
+            </p>
+            <p>数量:{{ $route.query.skuNum }}</p>
+          </div>
+        </div>
+        <div class="right-gocart">
+          <router-link
+            :to="{
+              name: 'Detail',
+              params: {
+                skuId: cart.id,
+              },
+            }"
+            class="sui-btn btn-xlarge"
+            >查看商品详情</router-link
+          >
+          <router-link to="/shopcart">去购物车结算 > </router-link>
+        </div>
+      </div>
+    </template>
+    <script>
+      export default{
+        data(){
+          return{
+            // 从sessionStorage拿到cart数据
+            cart:JSON.parse(window.sessionStorage.getItem('cart')),
+          };
+        },
+        mounted(){
+          if(!this.cart){
+            // 如果cart不存在,用户直接访问添加成功页面,跳转到购物车界面
+            this.$router.history.replace({
+              name:'ShopCart'
+            })
+          }
+        }
+      }
+    </script>
+  }
+  #views/ShopCart/ShopCart.vue
+  {
+    <template>
+      ...
+    </template>
+    <script>
+      import {mapActions,mapState} from 'vuex';
+      export default{
+        computed:{
+          ...mapState({
+            cartList:(state)=>state.shopcart.cartList
+          }),
+        },
+        methods:{
+          ...maoActions(['getCartList']),
+        },
+        mounted(){
+          this.getCartList();
+        }
+      }
+    </script>
+  }
+24.
