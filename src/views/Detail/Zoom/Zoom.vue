@@ -1,20 +1,35 @@
 <template>
   <div class="spec-preview">
-    <img src="../images/s1.png" />
+    <!-- <img :src="skuImageList[0].imgUrl" /> -->
+    <img :src="imgUrl" />
     <div ref="event" class="event" @mousemove="show"></div>
     <div ref="mask" class="mask"></div>
 
     <div class="big">
-      <img ref="bigImg" src="../images/s1.png" />
+      <!-- <img ref="bigImg" :src="skuImageList[0].imgUrl" /> -->
+      <img ref="bigImg" :src="bigUrl" />
     </div>
   </div>
 </template>
 
 <script>
+import throttle from 'lodash/throttle';
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'Zoom',
+  data() {
+    return {
+      // 可以不初始化么?不行,因为添加的数据不是响应式的!
+      imgUrl: '',
+      bigUrl: '',
+    };
+  },
+  computed: {
+    ...mapGetters(['skuImageList']),
+  },
   methods: {
-    show(e) {
+    show: throttle(function (e) {
       const { mask, bigImg } = this.$refs;
       /*
         offsetX:e事件距离该元素边缘的位置
@@ -40,7 +55,13 @@ export default {
       };
       bigImg.style.left = `${bigImgPosition.x}px`;
       bigImg.style.top = `${bigImgPosition.y}px`;
-    },
+    }, 10, {}),
+  },
+  mounted() {
+    this.$bus.$on('receive_imgs', ({ imgUrl, bigUrl }) => {
+      this.imgUrl = imgUrl;
+      this.bigUrl = bigUrl;
+    });
   },
 };
 </script>

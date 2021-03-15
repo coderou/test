@@ -1,1 +1,165 @@
 1.复习
+  分页器思路:
+    1.实现最基本的最理想的情况
+    2.考虑边界值,靠左,靠右,如果小于2,直接等于2,如果大于最大值-1,直接等于
+    3.考虑极端情况,小于7个,等于1个的时候
+    4.middle按钮动态显示
+    5.判断情况动态显示... 
+    6.按钮高亮,点击当前页面+1,极限值判断,
+    7.优化:频繁点击防抖,设置第一次生效,最后一次生效
+  其他:v-if和v-for不能同时使用,v-for优先级更高,但是配合v-if会造成不必要的性能浪费,解决办法是在外面包v-if
+  或者改变逻辑
+2.写一个获取元素到文档边缘距离的函数
+3.如果一上来就要初始化使用的话,最好就会初始化一个数据
+  #store/modules/detail.js
+  {
+    ...
+    skuImgList:[],
+  }
+4.放大镜和vuex异步拿数据的解决办法等
+  #store/modules/detail.js
+  {
+    // 既然始终拿不到 skuImageList[0].imgUrl,就直接初始化吧,
+    export const state={
+      goodsDetail:{
+        skuInfo:{
+          skuImgeList:[{imgUrl:''}],
+        },
+      },
+    };
+
+    export const getters={
+      skuImageList(state) {
+        return state.goodsDetail.skuInfo.skuImageList;
+      },
+    }
+  }
+  #views/Detail/Detail.vue
+  {
+    <template>
+      <Zoom />
+      <ImageList :skuImageList="skuInfo.skuImageList" />
+    </template>
+  }
+  #views/Detail/Zoom/Zoom.vue
+  {
+    <template>
+      <!-- <img :src="skuImageList[0].imgUrl" /> -->
+      <img :src="imgUrl" />
+
+      <div class="big">
+        <!-- <img ref="bigImg" :src="skuImageList[0].imgUrl" /> -->
+        <img ref="bigImg" :src="bigUrl" />
+      </div>
+    </template>
+    <script>
+      import {mapGetters} from 'vuex';
+      import throttle from 'lodash/throttle';
+      export default{
+        data() {
+          return {
+            // 可以不初始化么?不行,因为添加的数据不是响应式的!
+            imgUrl: '',
+            bigUrl: '',
+          };
+        },
+        computed: {
+          ...mapGetters(['skuImageList']),
+        },
+        methods: {
+          show: throttle(function (e) {
+            const { mask, bigImg } = this.$refs;
+            /*
+              offsetX:e事件距离该元素边缘的位置
+            */
+            const maskY = e.offsetY - mask.clientWidth / 2;
+            const maskX = e.offsetX - mask.clientHeight / 2;
+            // 滑块位置
+            const maskPosition = {
+              x: maskX,
+              y: maskY,
+            };
+            if (maskPosition.x <= 0) maskPosition.x = 0;
+            if (maskPosition.y <= 0) maskPosition.y = 0;
+            if (maskPosition.x >= 200)maskPosition.x = 200;
+            if (maskPosition.y >= 200)maskPosition.y = 200;
+            // console.log(maskPosition);
+            mask.style.left = `${maskPosition.x}px`;
+            mask.style.top = `${maskPosition.y}px`;
+            // 大图位置
+            const bigImgPosition = {
+              x: -maskX * 2,
+              y: -maskY * 2,
+            };
+            bigImg.style.left = `${bigImgPosition.x}px`;
+            bigImg.style.top = `${bigImgPosition.y}px`;
+          }, 10, {}),
+        },
+        mounted() {
+          this.$bus.$on('receive_imgs', ({ imgUrl, bigUrl }) => {
+            this.imgUrl = imgUrl;
+            this.bigUrl = bigUrl;
+          });
+        },
+      }
+    </script>
+  }
+  #views/Detail/ImageList/ImageList.vue
+  {
+    <template>
+      <div class="swiper-wrapper">
+        <div
+          v-for="(img, index) in skuImageList"
+          :key="img.id"
+          class="swiper-slide"
+        >
+          <img
+            :class="{ active: currentIndex === index }"
+            :src="img.imgUrl"
+            :alt="img.imgName"
+            @click="setCurrentIndex(index)"
+          />
+        </div>
+      </div>
+    </template>
+    <script>
+      import Swiper from 'swiper';
+      export default{
+        props: ['skuImageList'],
+        data() {
+          return {
+            currentIndex: 0,
+          };
+        },
+        watch: {
+          // 监视获取到了数据
+          skuImageList() {
+            this.setCurrentIndex(0);// 数据拿到,触发一次emit,将数据传递给Zoom
+            this.$nextTick(() => {
+              /* eslint-disable-next-line */
+              this.swiper = new Swiper(this.$refs.swiper, {
+                cssMode: true,
+                navigation: {
+                  nextEl: ".swiper-button-next",
+                  prevEl: ".swiper-button-prev",
+                },
+                slidesPerView: 5, // 每页显示图片数量
+                slidesPerGroup: 5, // 每次轮播滑动的图片数量
+              });
+            });
+          },
+        },
+        methods: {
+          setCurrentIndex(index) {
+            this.currentIndex = index;
+            this.$bus.$emit('receive_imgs', {
+              imgUrl: this.skuImageList[index].imgUrl,
+              bigUrl: this.skuImageList[index.imgUrl], // 将来大图不一样,就要换一个容器
+            });
+          },
+        },
+      }
+    </script>
+  }
+5.邪道速通:如果遇到页面渲染数据的时候,vuex还没有拿到数据或者数据还没有回来,方法就是用getters,直接映射,然后state中定义默认数据即可
+6.

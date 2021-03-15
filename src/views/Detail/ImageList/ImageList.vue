@@ -1,8 +1,17 @@
 <template>
   <div class="swiper-container">
     <div class="swiper-wrapper">
-      <div class="swiper-slide">
-        <img src="../images/s1.png" />
+      <div
+        v-for="(img, index) in skuImageList"
+        :key="img.id"
+        class="swiper-slide"
+      >
+        <img
+          :class="{ active: currentIndex === index }"
+          :src="img.imgUrl"
+          :alt="img.imgName"
+          @click="setCurrentIndex(index)"
+        />
       </div>
     </div>
     <div class="swiper-button-next"></div>
@@ -11,10 +20,43 @@
 </template>
 
 <script>
-// import Swiper from 'swiper';
+import Swiper from 'swiper';
 
 export default {
   name: 'ImageList',
+  props: ['skuImageList'],
+  data() {
+    return {
+      currentIndex: 0,
+    };
+  },
+  watch: {
+    // 监视获取到了数据
+    skuImageList() {
+      this.setCurrentIndex(0);// 数据拿到,触发一次emit,将数据传递给Zoom
+      this.$nextTick(() => {
+        /* eslint-disable-next-line */
+        this.swiper = new Swiper(this.$refs.swiper, {
+          cssMode: true,
+          navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          },
+          slidesPerView: 5, // 每页显示图片数量
+          slidesPerGroup: 5, // 每次轮播滑动的图片数量
+        });
+      });
+    },
+  },
+  methods: {
+    setCurrentIndex(index) {
+      this.currentIndex = index;
+      this.$bus.$emit('receive_imgs', {
+        imgUrl: this.skuImageList[index].imgUrl,
+        bigUrl: this.skuImageList[index.imgUrl], // 将来大图不一样,就要换一个容器
+      });
+    },
+  },
 };
 </script>
 

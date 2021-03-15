@@ -24,7 +24,7 @@ Vue.component('TypeNav', TypeNav);
 Vue.component('Carousel', Carousel);
 
 // 添加全局事件总线对象
-// Vue.prototype.$bus = new Vue();
+Vue.prototype.$bus = new Vue();
 new Vue({
   router,
   store,

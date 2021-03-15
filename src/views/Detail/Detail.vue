@@ -17,7 +17,7 @@
           <!--放大镜效果-->
           <Zoom />
           <!-- 小图列表 -->
-          <ImageList />
+          <ImageList :skuImageList="skuInfo.skuImageList" />
         </div>
         <!-- 右侧选择区域布局 -->
         <div class="InfoWrap">
@@ -347,7 +347,7 @@ export default {
     // ...mapState({
     //   good: (state) => state.detail.good,
     // }),
-    ...mapGetters(["categoryView", "skuInfo", "spuSaleAttrList"]),
+    ...mapGetters(['categoryView', 'skuInfo', 'spuSaleAttrList']),
   },
   methods: {
     ...mapActions(['getDetail']),
@@ -356,8 +356,6 @@ export default {
     // 请求商品详情数据
     const { skuId } = this.$route.params;
     this.getDetail(skuId);
-    console.log(this.state);
-    // console.log(this.good);
   },
 };
 </script>

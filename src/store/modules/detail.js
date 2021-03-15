@@ -7,7 +7,9 @@ export const state = {
     // 商品分类
     categoryView: {},
     // 商品详情数据
-    skuInfo: {},
+    skuInfo: {
+      skuImageList: [{ imgUrl: '' }],
+    },
     // 商品销售属性值列表
     spuSaleAttrList: [],
   },
@@ -22,6 +24,9 @@ export const getters = {
   },
   spuSaleAttrList(state) {
     return state.goodsDetail.spuSaleAttrList;
+  },
+  skuImageList(state) {
+    return state.goodsDetail.skuInfo.skuImageList;
   },
 };
 
