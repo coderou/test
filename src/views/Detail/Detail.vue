@@ -370,31 +370,34 @@ export default {
   },
   methods: {
     ...mapActions(['getDetail', 'addCartList']),
-    // 这里是利用vue响应式的特点,react中就要真的遍历了
+    // 方法:改变商品attr的选中状态  tip:这里是利用vue响应式的特点,react中就要真的遍历了
     setChecked(saleAttrValue, saleAttrValueList) {
       // eslint-disable-next-line no-return-assign
       saleAttrValueList.forEach((value) => (value.isChecked = '0'));
       saleAttrValue.isChecked = '1';
     },
+    // 方法:添加购物车
     async addCart() {
       // 1.发送请求,更新购物车数据
+      // #region
       /*
         tip:
           调用action函数返回值是一个promise对象
         面试:
-          怎么等添加成功后,在这里处理成功\失败的情况? 
+          怎么等添加成功后,在这里处理成功\失败的情况?
           在内部将发送请求的promise返回出来
       */
-      // const res = await this.addCartList({ skuId: this.skuInfo.id, skuNum: this.num });
-      // console.log(res) // 是一个promise对象,注意:acitons内部包含了2个promsie请求,外层是这里的,内层才是真正发送请求
-      // this.addCartList({
-      //   skuId: this.skuInfo.id,
-      //   skuNum: this.num,
-      // })
-      //   // 请求成功==功能成功(因为设置了拦截器)
-      //   .then(() => {})
-      //   // 功能失败
-      //   .catch((message) => {});
+      /* const res = await this.addCartList({ skuId: this.skuInfo.id, skuNum: this.num });
+      console.log(res) // 是一个promise对象,注意:acitons内部包含了2个promsie请求,外层是这里的,内层才是真正发送请求
+      this.addCartList({
+        skuId: this.skuInfo.id,
+        skuNum: this.num,
+      })
+        // 请求成功==功能成功(因为设置了拦截器)
+        .then(() => {})
+        // 功能失败
+        .catch((message) => {}); */
+      // #endregion
 
       try {
         await this.addCartList({
@@ -404,9 +407,8 @@ export default {
         // 2.请求成功,存储数据到sessionStorage中(会话存储)
         // eslint-disable-next-line
         const { skuName, skuDesc, skuDefaultImg, price } = this.skuInfo;
-
         // #region
-        /* 
+        /*
         "spuSaleAttrList": [
           {
             "id": 1,
