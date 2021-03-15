@@ -26,6 +26,10 @@ export default {
         x: maskX,
         y: maskY,
       };
+      if (maskPosition.x <= 0) maskPosition.x = 0;
+      if (maskPosition.y <= 0) maskPosition.y = 0;
+      if (maskPosition.x >= 200)maskPosition.x = 200;
+      if (maskPosition.y >= 200)maskPosition.y = 200;
       // console.log(maskPosition);
       mask.style.left = `${maskPosition.x}px`;
       mask.style.top = `${maskPosition.y}px`;
