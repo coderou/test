@@ -17,7 +17,10 @@
           <!--放大镜效果-->
           <Zoom />
           <!-- 小图列表 -->
-          <ImageList :skuImageList="skuInfo.skuImageList" />
+          <ImageList
+            v-if="skuInfo.skuImageList.length"
+            :skuImageList="skuInfo.skuImageList"
+          />
         </div>
         <!-- 右侧选择区域布局 -->
         <div class="InfoWrap">
@@ -82,17 +85,26 @@
                     active: spuSaleAttrValue.isChecked === '1',
                   }"
                   :key="spuSaleAttrValue.id"
+                  @click="
+                    setChecked(
+                      spuSaleAttrValue,
+                      spuSaleAttr.spuSaleAttrValueList,
+                    )
+                  "
                 >
                   {{ spuSaleAttrValue.saleAttrValueName }}
                 </dd>
               </dl>
             </div>
             <div class="cartWrap">
-              <div class="controls">
-                <input autocomplete="off" class="itxt" value="1" />
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
-              </div>
+              <!--
+                v-model 指令原理：
+                  给元素绑定value属性和input事件
+                  给组件设置v-model
+                    组件得到一个value属性
+                        和一个自定义事件input
+               -->
+              <InputNumber v-model="num" />
               <div class="add">
                 <a href="javascript:">加入购物车</a>
               </div>
@@ -336,12 +348,19 @@
 import { mapGetters, mapActions } from 'vuex';
 import ImageList from './ImageList/ImageList';
 import Zoom from './Zoom/Zoom';
+import InputNumber from './InputNumber/InputNumber.vue';
 
 export default {
   name: 'Detail',
+  data() {
+    return {
+      num: 2, // 默认显示数量
+    };
+  },
   components: {
     ImageList,
     Zoom,
+    InputNumber,
   },
   computed: {
     // ...mapState({
@@ -351,6 +370,12 @@ export default {
   },
   methods: {
     ...mapActions(['getDetail']),
+    // 这里是利用vue响应式的特点,react中就要真的遍历了
+    setChecked(saleAttrValue, saleAttrValueList) {
+      // eslint-disable-next-line no-return-assign
+      saleAttrValueList.forEach((value) => (value.isChecked = '0'));
+      saleAttrValue.isChecked = '1';
+    },
   },
   mounted() {
     // 请求商品详情数据
@@ -523,46 +548,6 @@ export default {
           }
 
           .cartWrap {
-            .controls {
-              width: 48px;
-              position: relative;
-              float: left;
-              margin-right: 15px;
-
-              .itxt {
-                width: 38px;
-                height: 37px;
-                border: 1px solid #ddd;
-                color: #555;
-                float: left;
-                border-right: 0;
-                text-align: center;
-              }
-
-              .plus,
-              .mins {
-                width: 15px;
-                text-align: center;
-                height: 17px;
-                line-height: 17px;
-                background: #f1f1f1;
-                color: #666;
-                position: absolute;
-                right: -8px;
-                border: 1px solid #ccc;
-              }
-
-              .mins {
-                right: -8px;
-                top: 19px;
-                border-top: 0;
-              }
-
-              .plus {
-                right: -8px;
-              }
-            }
-
             .add {
               float: left;
 

@@ -29,6 +29,7 @@ export default {
     ...mapGetters(['skuImageList']),
   },
   methods: {
+    // eslint-disable-next-line func-names
     zoom: throttle(function (e) {
       const { mask, bigImg } = this.$refs;
       /*

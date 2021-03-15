@@ -37,7 +37,7 @@ export default {
       this.$nextTick(() => {
         /* eslint-disable-next-line */
         this.swiper = new Swiper(this.$refs.swiper, {
-          cssMode: true,
+          // cssMode: true,
           navigation: {
             nextEl: ".swiper-button-next",
             prevEl: ".swiper-button-prev",
@@ -68,7 +68,8 @@ export default {
   padding: 0 12px;
 
   .swiper-slide {
-    width: 56px;
+    display: flex;
+    justify-content: center;
     height: 56px;
 
     img {
