@@ -1,17 +1,43 @@
 <template>
   <div class="spec-preview">
     <img src="../images/s1.png" />
-    <div class="event"></div>
+    <div ref="event" class="event" @mousemove="show"></div>
+    <div ref="mask" class="mask"></div>
+
     <div class="big">
-      <img src="../images/s1.png" />
+      <img ref="bigImg" src="../images/s1.png" />
     </div>
-    <div class="mask"></div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Zoom',
+  methods: {
+    show(e) {
+      const { mask, bigImg } = this.$refs;
+      /*
+        offsetX:e事件距离该元素边缘的位置
+      */
+      const maskY = e.offsetY - mask.clientWidth / 2;
+      const maskX = e.offsetX - mask.clientHeight / 2;
+      // 滑块位置
+      const maskPosition = {
+        x: maskX,
+        y: maskY,
+      };
+      // console.log(maskPosition);
+      mask.style.left = `${maskPosition.x}px`;
+      mask.style.top = `${maskPosition.y}px`;
+      // 大图位置
+      const bigImgPosition = {
+        x: -maskX * 2,
+        y: -maskY * 2,
+      };
+      bigImg.style.left = `${bigImgPosition.x}px`;
+      bigImg.style.top = `${bigImgPosition.y}px`;
+    },
+  },
 };
 </script>
 

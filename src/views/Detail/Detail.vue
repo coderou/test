@@ -1,7 +1,6 @@
 <template>
   <div class="detail">
     <!-- 商品分类导航 -->
-  <button @click="show">按钮</button>
     <TypeNav />
     <!-- 主要内容区域 -->
     <section class="con">
@@ -352,9 +351,6 @@ export default {
   },
   methods: {
     ...mapActions(['getDetail']),
-    show() {
-      console.log(this.categoryView);
-    },
   },
   mounted() {
     // 请求商品详情数据
