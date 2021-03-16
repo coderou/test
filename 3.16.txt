@@ -21,15 +21,15 @@
     methods
     展示getters数据
     -完成总价和商品数量
-  3.打开更新商品接口
+  3.store
     定义actions[{id,isChechked}]
     then触发commit
-    定义mutations
+    定义mutations,更新cartList的状态,利用find函数
   4.给input绑定change事件,触发发送请求
     tip:定义接口的时候,接口文档是有可能出错的,这里不是GET,有可能是PUT\PATCH
     but:还会报错了.,...
     然后看ID是不是错误的-->用postman测试
-    然后发现isChecked是0\1,不是false或者true,请求方式GET
+    然后发现isChecked是0\1,不是false或者true,请求方式还是GET,没设计好
   5.store/modules/shopcart.js
     定义getter的isCheckAll
     !!a  将a转换为布尔值  等价于 Boolean(a)
@@ -37,8 +37,7 @@
     QA:s===a=1是什么意思?
     接口没有全选的话,当点击全选,就直接发送需要修改的
     遇到多个请求发,等都更新完成再返回,用Promise.all
-  7.增删改查是以后开发最常见的功能,必须要会
-  8.
+  tip:增删改查是以后开发最常见的功能,必须要会
 3.代码实现:
   tip:fixBug
   #views/Detail/InputNumber/InputNumber.vue 
@@ -51,6 +50,93 @@
         }
       }
     }
+  }
+  #store/modules/shopcart.js
+  {
+    import {reqUpdateCartList} from '@/api/shopcart'
+
+    export const getters = {
+      // 1.总价
+      totalPrice(state) {
+        // reduce查找商品的isChecked为1(转换boolean为true,0为false),添加其Price*num
+        return state.cartList.reduce((p, c) => p + (c.isChecked ? c.skuPrice * c.skuNum : 0), 0);
+      },
+      // 2.已选商品的数量
+      checkedNum(state) {
+        return state.cartList.reduce((p, c) => p + (c.isChecked ? c.skuNum : 0), 0);
+      },
+      // 3.是否全选
+      isCheckAll(state) {
+        return !state.cartList.find((cart) => !cart.isChecked);
+      },
+    };
+
+    export const actions={
+      // 3.更新购物车某商品状态
+      updateCartList({ commit }, { skuId, isChecked }) {
+        reqUpdateCartList(skuId, isChecked).then(() => {
+          commit('UPDATE_CART_LIST', { skuId, isChecked });
+        });
+      },
+    }
+
+    export const mutations={
+      UPDATE_CART_LIST(state, { skuId, isChecked }) {
+        // 找到符合Id的购物车cart商品
+        const cart = state.cartList.find(() => cart.skuId === skuId);
+        // 更新isChecked
+        cart.isChecked = isChecked;
+      },
+    }
+  }
+  #views/ShopCart/ShopCart.vue
+  {
+    <template>
+      <li class="cart-list-con1">
+        <input
+          type="checkbox"
+          name="chk_list"
+          :checked="cart.isChecked"
+          @change="handleChecked(cart.skuId, !cart.isChecked)"
+        />
+      </li>
+      ...
+      <div class="select-all">
+        <input
+          class="chooseAll"
+          :checked="isCheckAll"
+          @change="handleCheckALl"
+          type="checkbox"
+        />
+        <span>全选</span>
+      </div>
+      ...
+      <div class="chosed">
+        已选择 <span>{{ checkedNum }}</span
+      >件商品
+      </div>
+      <div class="sumprice">
+        <em>总价（不含运费） ：</em>
+        <i class="summoney">{{ totalPrive }}</i>
+      </div>
+    </template>
+    <script>
+      import {mapGetters} from 'vuex'
+      export default{
+        computed:{
+          ...mapGetters(['totalPrice', 'checkedNum', 'isCheckAll'])
+        },
+        methods:{
+          ...mapActions(['updateCartList']),
+          handleChecked(skuId,isChecked){
+            // isChecked 值为1或0
+            // tip:直接取反是因为你要改变的就是现在的取反
+            this.updateCartList({ skuId, isChecked: isChecked ? 1 : 0 });
+          },
+          handleCheckALl() {},
+        },
+      };
+    </script>
   }
 
 

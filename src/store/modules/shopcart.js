@@ -1,7 +1,7 @@
 import {
   reqGetCartList,
   reqAddCartList,
-  // reqUpdateCartList,
+  reqUpdateCartList,
   // reqDeleteCartList,
 } from '@/api/shopcart';
 
@@ -9,7 +9,21 @@ export const state = {
   cartList: [],
 };
 
-export const getters = {};
+export const getters = {
+  // 1.总价
+  totalPrice(state) {
+    // reduce查找商品的isChecked为1(转换boolean为true,0为false),添加其Price*num
+    return state.cartList.reduce((p, c) => p + (c.isChecked ? c.skuPrice * c.skuNum : 0), 0);
+  },
+  // 2.已选商品的数量
+  checkedNum(state) {
+    return state.cartList.reduce((p, c) => p + (c.isChecked ? c.skuNum : 0), 0);
+  },
+  // 3.是否全选
+  isCheckAll(state) {
+    return !state.cartList.find((cart) => !cart.isChecked);
+  },
+};
 
 export const actions = {
   // 1.获取购物车信息
@@ -39,6 +53,12 @@ export const actions = {
       // .then(() => {}) // 成功/失败都会触发,只要是没有报错,没有返回promise,都会触发
     });
   },
+  // 3.更新购物车某商品状态
+  updateCartList({ commit }, { skuId, isChecked }) {
+    reqUpdateCartList(skuId, isChecked).then(() => {
+      commit('UPDATE_CART_LIST', { skuId, isChecked });
+    });
+  },
 };
 
 export const mutations = {
@@ -46,4 +66,10 @@ export const mutations = {
     state.cartList = cartList;
   },
   ADD_CART_LIST() {},
+  UPDATE_CART_LIST(state, { skuId, isChecked }) {
+    // 找到符合Id的购物车cart商品
+    const cart = state.cartList.find((cart) => cart.skuId === skuId);
+    // 更新isChecked
+    cart.isChecked = isChecked;
+  },
 };
