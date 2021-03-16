@@ -1,0 +1,64 @@
+1.复习
+  1.swiper注意点:一定要等数据回来,dom元素渲染后,才new
+  2.利用$bus,点击下面的swiper,通知放大镜更新图片显示
+  3.attr选择时,直接将响应式对象传递给他显示,当改变对象的某属性,会响应式地更新视图
+  4.更新Detail/InputNumber.vue
+  5.blur:失去焦点才会判断,input只要输入就会判断,v-model会一直校验,非法的无法输入(是直接被修正了)
+    看情况,如果需要严格校验,直接v-model,如果不是对校验很严格,希望兼容低端机器,用blur进行判断
+  6.如何等待购物车添加成功再跳转?
+    将store里面的actions的addCartList里面的req请求axios返回出去
+  7.sessionStorage和localStorage的区别:local是永久,session是会话临时存储,会话:打开浏览器打开页面就在,关闭就没了
+  8.2021年3月16日09:01:30,检查口罩
+  9.当2个组件都在才能用全局事件总线
+  10.请求拦截器:设置公共的请求参数,响应拦截器:设置报错响应
+    tip:Nprogress:只有开始\结束是准确的
+2.购物车步骤分析
+  1.#store/modules/shopcart.js
+    getters计算totalPrice[通过reduce],checkedNum[reduce]
+  2.映射getter #ShopCart.vue
+    import
+    computed
+    methods
+    展示getters数据
+    -完成总价和商品数量
+  3.打开更新商品接口
+    定义actions[{id,isChechked}]
+    then触发commit
+    定义mutations
+  4.给input绑定change事件,触发发送请求
+    tip:定义接口的时候,接口文档是有可能出错的,这里不是GET,有可能是PUT\PATCH
+    but:还会报错了.,...
+    然后看ID是不是错误的-->用postman测试
+    然后发现isChecked是0\1,不是false或者true,请求方式GET
+  5.store/modules/shopcart.js
+    定义getter的isCheckAll
+    !!a  将a转换为布尔值  等价于 Boolean(a)
+  6.在更新的时候更新Vuex的数据
+    QA:s===a=1是什么意思?
+    接口没有全选的话,当点击全选,就直接发送需要修改的
+    遇到多个请求发,等都更新完成再返回,用Promise.all
+  7.增删改查是以后开发最常见的功能,必须要会
+  8.
+3.代码实现:
+  tip:fixBug
+  #views/Detail/InputNumber/InputNumber.vue 
+  {
+    export default{
+      watch:{
+        newValue(newVal,oldVal){
+          ...
+          finalVal.Math.ceil(finalVal);// 用户数输入小数取整
+        }
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
+

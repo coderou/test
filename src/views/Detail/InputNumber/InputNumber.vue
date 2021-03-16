@@ -51,6 +51,7 @@ export default {
   },
   watch: {
     newValue(newVal, oldVal) {
+      // #region
       /*
         1. 如果值是非法的：10abc
           使用oldVal
@@ -64,6 +65,7 @@ export default {
         4. 如果值合法的
           就使用newVal
        */
+      // #endregion
       // console.log(newVal, oldVal);
       if (newVal === oldVal) return;
 
@@ -93,7 +95,7 @@ export default {
         // this.$emit("input", this.newValue);
         // return
       }
-
+      finalVal.Math.ceil(finalVal);// 用户数输入小数取整
       this.newValue = finalVal;
       this.$emit('input', finalVal);
     },

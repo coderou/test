@@ -427,8 +427,86 @@
     let res = flat([1, 2, [3, 4, [5, 6], 7], 8,[2,3,[3,[4]]], [9]]);
     console.log(res);
   7.chunk
-    
-13.
+    function chunk(pre_arr, num=1) {
+      let arr=pre_arr.slice() 
+      let newArr = [];
+      function _chunk(arr, num) {
+        if (arr.length <= 0) return;
+        if (arr.length <= num) {
+          newArr.push(arr.splice(0, arr.length));
+        } else {
+          newArr.push(arr.splice(0, num));
+          _chunk(arr, num);
+        }
+      }
+      _chunk(arr, num);
+      return newArr;
+    }
+  8.Vue组件父子组件生命周期顺序?
+  9.手写一个斐波那契数列吧
+
+  10.数组去重?
+  11.缓存LRU( least Recently Used)最不经常使用
+  12.对象深拷贝
+  13.
+
+  
+13.看coderwhy老师的视频,(vue后期的移动端下拉加载更多等)
+14.看华哥发的面试笔记
+15.准备简历
+16.自己用尚品汇的api写一个下拉加载更多,甚至直接写一个移动端的尚品汇
+17.哔哩哔哩空间复杂度,时间复杂度0102
+18.studystudystudy
+  1.AS
+    {
+      看老陈搭建项目结构->看Vue项目->哔哩哔哩搜索leetCode
+      为什么有时候发呆的时候停不下来?
+      ctrl+d->收藏当前网页
+      ctrl+w->关闭当前网页
+      space 向下滚动网页
+      alt + E 打开工具菜单,可以快捷键找到历史记录
+      ctrl+shift+b打开\关闭收藏标签栏
+      shift+esc打开谷歌浏览器的任务管理器
+      win+m最小化窗口
+      哔哩哔哩搜索 带着你看代码
+      uo看看正则
+      ctrl+shift+s 另存为
+      为什么喜欢黑色?因为身处黑暗,那为数不多的色彩才显得妮足珍贵
+      书和github仓库:you-dont-know-js 你不知道的js,第一册写很好
+      babel编译一些新语法的时候,浏览器会报错,怎么处理?需要webpack.comfig.js中配置babel.loader里面加上'corejs':2
+      corejs做了很多的新语法的实现,其中解决async和await问题的corejs版本2,里面有一个regender的文件
+      1.-g的本质原因是将路径添加到了环境变量path
+      2.babel:将es6转换为es5,jsx转换为js
+      看前端面试录像(饥人谷),bilibli搜索项目
+      复习一下react的redux版本todolist
+      做一个刷面试题的app,引申,可以做一个学习的app
+      晨测是为了养成每天记东西的习惯
+      将一些最常用的模板,比如store,api文件夹放在桌面
+      只是老师教的是不够的
+      家乡是用来怀念的
+      尚品汇的页面头部找个时间直接写一次
+      上课跟着敲是没用的没用的没用的!!
+      所以-->写伪代码笔记,参考3.9.txt
+      回想起来SSG之前的在家玩儿原神的日子...
+    }
+  2.git 拉取指定分支:
+    git pull -b xiongjian:xioangjian http://....
+  3.plus: + minus -
+  4.vue3:
+    1.vue3是组合API(aomposition API) 基于函数实现
+      问题:为什么要基于函数? 
+        因为函数方便抽离,方便组合,方便抽象化的,可以利用闭包
+      优点:在使用vue2的配置对象的时候,很多时候配置对象会变得非常庞大,抽离组件有会导致开发难度增加,组件间通信变得复杂
+        使用Vue3的组合API,可以将配置对象中的方法抽离出去,options也就不会变得臃肿,而且提高了方法的复用性
+    2.vue2是options API 基于配置对象实现  
+      如果需要实现单个组件的大量方法,methods往往会变得臃肿
+    3.高内聚:
+    4.低耦合:
+  5.书读百遍其义自见,代码敲一遍,至少懂一半
+  6.mutations里面必须是一个纯函数
+  7.webpack
+  8.服务器端渲染
+19.
 
 
 
