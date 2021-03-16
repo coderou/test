@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 // import Carousel from './components/Carousel/index.vue';
 import Carousel from '@/components/Carousel';
 import TypeNav from '@/components/TypeNav/index.vue';
@@ -22,6 +23,8 @@ Vue.config.productionTip = false;
 // 注册全局组件
 Vue.component('TypeNav', TypeNav);
 Vue.component('Carousel', Carousel);
+Vue.component('ValidationObserver', ValidationObserver);
+Vue.component('ValidationProvider', ValidationProvider);
 
 // 添加全局事件总线对象
 Vue.prototype.$bus = new Vue();
