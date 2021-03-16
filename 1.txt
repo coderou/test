@@ -506,7 +506,8 @@
   6.mutations里面必须是一个纯函数
   7.webpack
   8.服务器端渲染
-19.
+19.edge浏览器大声朗读ctrl+shift+u
+20.
 
 
 

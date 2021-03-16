@@ -463,5 +463,240 @@
       }
     </script>
   }
-16.
+16.tip:为什么传参要写对象形式?因为对象形式结构不会因为顺序不同而不同
+17.tip:如果vuex返回了一个promise请求,vuex中就不需要写catch了,在组件中发送请求的地方写trycatch语句
+18.tip:正常情况下,一开始访问会验证token,所以会有一个验证token的接口
+  1.用户可能伪造
+  2.可能过期
+19.推出登录->点击首页->但是vuex的没有清楚->还是会跳转到首页
+  tip:要清空vuex和localStorage
+20.面试:说的时候可以所艺术哦
+  难点怎么做的,组件怎么封装的,优化怎么优化的,面试的时候项目是百分百用的
+  支付详情页面
+  项目优化
+  封装组件
+2021年3月16日17:02:09
+21.直播,在线教育,在线办公,视频,在线会议,webRTC技术
+  tip[csdn]:https://blog.csdn.net/TTKatrina/article/details/73551267
+  tip[知乎]:https://www.zhihu.com/question/25497090
+22.登录功能和注册功能
+  #api/user.js
+  {
+    import request from './request';
+    // 1.发送注册验证码
+    export const reqSendCode = ({ phone }) =>
+      request({
+        method: 'GET',
+        url: `/api/user/passport/sendCode/${phone}`,
+      });
+    // 2.注册
+    export const reqRegister = ({ phone, password, code }) =>
+      request({
+        method: 'POST',
+        url: '/user/passport/register',
+        data: { phone, password, code },
+      });
+    // 3.登录
+    export const reqLogin = ({ phone, password }) =>
+      request({
+        method: 'POST',
+        url: `/user/passport/login`,
+        data: { phone, password },
+      });
+    // 4.登出
+    export const reqLogout = ({ phone, password }) =>
+      request({
+        method: 'GET',
+        url: `/user/passport/logout`,
+        data: { phone, password },
+      });
+  }
+  #store/modules/user.js
+  {
+    import { reqLogin, reqLogout } from '@/api/user';
 
+    export const state = {
+      user: JSON.parse(window.localStorage.getItem('user')) || "",
+    };
+
+    export const getters = {
+    };
+
+    export const actions = {
+      login({ commit }, { phone, password }) {
+        return reqLogin({ phone, password })
+          .then((user) => {
+            commit('LOGIN', user);
+            return user; // 外面接收到的就是这里promise的返回值
+          });
+      },
+      logout({ commit }) {
+        return reqLogout().then(() => {
+          commit('LOGOUT');
+        });
+      },
+    };
+
+    export const mutations = {
+      LOGIN(state, user) {
+        state.user = user;
+      },
+      LOGOUT(state) {
+        state.user = {};
+      },
+    };
+  }
+  #store/modules/index.js
+  {
+    import * as user from './user.js'
+    export default{
+      user,
+    }
+  }
+  #views/Register/Register.vue
+  {
+    <template>
+      ...
+      <label>验证码:</label>
+      <input v-model="code" type="text" placeholder="请输入验证码" />
+      <span class="sendCode" @click="sendCode">发送验证码</span>
+      <span class="error-msg">{{ errors[0] }}</span>
+      ....
+    </template>
+    <script>
+      import { reqSendCode ,reqRegister} from '@/api/user';      
+      const codeReg = /^[0-9A-Za-z]{6}$/;
+      const passwordReg = /^[0-9A-Za-z]{6,12}$/;
+
+      extend('password',{
+        validate(value) {
+          if (passwordReg.test(value)) {
+            return true;
+          }
+          return "密码不符合规范";
+        },
+      })
+      export default{
+        methods:{
+          // 表单提交方法
+          // 表单校验通过才会触发
+          async onSubmit(){
+            try{
+              const {phone,password,code}=this
+              await reqRegister({phone,password,code})
+              this.$router.history.replace('/login')
+            } catch(e){
+              console.log(e);
+            }           
+          },
+          async sendCode(){
+            if(this.phone){
+              const code=await reqSendCode()
+              console.log(code)
+            };
+          },
+        },
+      };
+    </script>
+  }
+  #views/Login/Login.vue
+  {
+    <template>
+      <ValidationObserver v-slot="{handleSubmit}">
+        <form @submit.prevent="handleSubmit(onSubmit)">
+          <ValidationProvider
+            class="input-text clearFix"
+            name="phone"
+            v-slot="{ errors }"
+            :rules="`required|phone`"
+            tag="div"
+            mode="eager"
+            >
+            <span></span>
+            <input
+              type="text"
+              v-model="phone"
+              placeholder="邮箱/用户名/手机号"
+            />
+            <i>{{ errors[0] }}</i>
+          </ValidationProvider>
+          <ValidationProvider
+            class="input-text clearFix"
+            name="password"
+            v-slot="{ errors }"
+            :rules="`required|password`"
+            tag="div"
+            mode="eager"
+            >
+            <span class="pwd"></span>
+            <input
+              type="text"
+              v-model="password"
+              placeholder="请输入密码"
+            />
+            <i>{{ errors[0] }}</i>
+          </ValidationProvider>
+          <div class="setting clearFix">
+            <label class="checkbox inline">
+              <input name="m1" type="checkbox" value="2" checked="" />
+              自动登录
+            </label>
+            <span class="forget">忘记密码？</span>
+          </div>
+          <button class="btn">登&nbsp;&nbsp;录</button>
+        </form>
+      </ValidationObserver>
+    </template>
+    <script>
+      import {mapActions} from 'vuex';
+      import {extend} from 'vee-validate';
+      import {required} from 'vee-validate/dist/rules';
+
+      const phoneReg = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+      const passwordReg = /^[0-9A-Za-z]{6,12}$/;
+
+      extend('required',{
+        ...required,
+        message:'🍕这里必须填'
+      })
+      extend('phone',{
+        validate(value){
+          if(phoneReg.test(value)){
+            return true
+          }
+          return '🍔电话不对'
+        }
+      })
+      extend('password', {
+        validate(value) {
+          if (passwordReg.test(value)) {
+            return true;
+          }
+          return '请输入6-12位的密码';
+        },
+      });
+
+      export default{
+        data(){
+          return {
+            phone:'',
+            password:'',
+          };
+        },
+        methods:{
+          ...mapAction(['login']),
+          async onSubmit(){
+            try{
+              const {phone,password}=this
+              // tip:await会将promise的结果值返回,而promise的返回值就是vuex的promise返回的user
+              const user=await login({phone,password})
+              window.localStorage.setItem('user',JSON.stringify(user))
+              this.$router.history.replace('/')
+            }catch(e){
+              console.log(e)
+            }
+          }
+        },
+      };
+    </script>
+  }

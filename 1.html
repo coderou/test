@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .test {
-      width: 500px;
-      border: 1px solid salmon;
-    }
-  </style>
-  <body>
-    数组排序(失败品)
-    <!-- <script>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .test {
+    width: 500px;
+    border: 1px solid salmon;
+  }
+</style>
+
+<body>
+  <!-- 数组排序(失败品) -->
+  <!-- <script>
       [1, 3, 2, 5, 4].reduce((p, c, i, a) => {
         for (var i = 0; i <= p.length; i++) {
           console.log(i)
@@ -36,8 +39,8 @@
         return p;
       }, []);
     </script> -->
-    手写数组排序
-    <!-- <script>
+  <!-- 手写数组排序 -->
+  <!-- <script>
       [1, 3, 2, 5, 4].reduce((p, c) => {
         // p.push(c);
         if (p.length === 0) {
@@ -71,8 +74,8 @@
       arr.splice(0,0,999)
       console.log(arr); */
     </script> -->
-    手写flat
-    <!-- <script>
+  <!-- 手写flat -->
+  <!-- <script>
       function flat(arr) {
         let res = [];
         function fn(_arr) {
@@ -90,8 +93,8 @@
       let res = flat([1, 2, [3, 4, [5, 6], 7], 8,[2,3,[3,[4]]], [9]]);
       console.log(res);
     </script> -->
-    手写chunk?
-    <!-- <script>
+  <!-- 手写chunk? -->
+  <!-- <script>
       //第一版
       /* function chunk(arr,num) {
         let newArr = [];
@@ -177,10 +180,10 @@
         return newArr;
       }
     </script> -->
-    手写数组去重
-    <script></script>
-    手写斐波那契数列 0、1、1、2、3、5、8、13
-    <!-- <script>
+  <!-- 手写数组去重 -->
+  <script></script>
+  <!-- 手写斐波那契数列 0、1、1、2、3、5、8、13 -->
+  <!-- <script>
       // 斐波那契数列 0、1、1、2、3、5、8、13
       // 函数:计算第N位的斐波那契数列
       function fn(num) {
@@ -193,37 +196,95 @@
       let now = (Date.now() - pre) / 1000;
       console.log(res, now + 's'); //701408733  7.468s
     </script> -->
-    链表数据结构和lru缓存读写?
-    <br />
-    <pre>
-      1.点击li,时间值变为最新状态,并且将改li移动到最上面,
+  <!-- 链表数据结构和lru缓存读写? -->
+  <!-- <p>DOM版本的lru测试?</p>
+  <pre>
+      1.点击li,时间值变为最新状态,并且将改li移动到最下面,
       2.点击添加按钮,向ul添加一个li
-      3.ul的最大容器长度为5,达到5再点击添加,将会remove掉最后一个li
-    </pre>
-    <button id="add">添加</button>
-    <ul id="test">
-    </ul>
-    <script>
-      var ul = document.getElementById('test');
-      var lis = document.getElementsByClassName('#test li');
-      var add = document.getElementById('add');
+      3.ul的最大容器长度为5,达到5再点击添加,将会remove掉第一个li
+  </pre>
+  <button id="add">添加</button>
+  <ul id="test">
+    <li>1615891014222</li>
+    <li>1615891014531</li>
+    <li>1615891014833</li>
+  </ul> -->
+  <!-- <script>
+    // 1.获取ul
+    var ul = document.getElementById('test');
+    // 2.获取lis
+    // var lis = document.getElementsByClassName('#test li');
+    // 3.获取add按钮
+    var add = document.getElementById('add');
+    // 4.点击add按钮,添加时间戳
+    function checkLength(){
+      // console.dir(ul.children);
+      if(ul.children.length>5){
+        var lis = document.querySelectorAll('#test li');
+        // console.log(lis);
+        ul.removeChild(lis[0])
+      }
+    }
+    add.addEventListener('click', function () {
+      // 创建newLi节点
       var newLi = document.createElement('li');
+      // newLi节点初始化内容
       newLi.innerHTML = Date.now();
+      // 添加到ul中
+      ul.appendChild(newLi)
+      checkLength()
+    })
+    // 5.借助冒泡,点击ul,获取li
+    ul.addEventListener('click', function (e) {
+      // 创建一个frag用于保存从ul拿出来的节点
+      const frag = document.createDocumentFragment()
+      // 将节点添加到frag,此时DOM自动删除节点
+      frag.appendChild(e.target)
+      // 将节点添加到ul,此时ul节点顺序改变
+      ul.appendChild(frag)
+      // 将最新添加的li节点更新时间戳
+      ul.lastElementChild.innerHTML = Date.now()
+      /* let date = Date.now()
+      date = date + ''
+      console.log(date);
+      ul.lastElementChild.innerHTML = date.slice(6,20) */
+      checkLength()
+    })
+  </script> -->
+  <!-- 🍟🍟优化斐波那契数列求第N个值函数!!! -->
+  <!-- <script>
+    var cache = {}
+    // 1.拿去缓存中的值的函数
+    function checkNum(num) {
+      return cache[num] && cache[num]
+    }
+    // 2.设置缓存器的函数
+    function setNum(num, res) {
+      cache[num] = res
+    }
+    // 函数:计算斐波那契数列N项的值
+    function fibonacci(num) {
+      let res = checkNum(num)
+      if (res) return res
+      if (num === 1) return 0;
+      if (num === 2) return 1;
+      res = fibonacci(num - 1) + fibonacci(num - 2);
+      setNum(num, res)
+      return res
+    }
 
-      add.addEventListener('click',function(){
-        ul.appendChild(newLi)
-      })
+    let pre = Date.now();
+    var res = fibonacci(100);
+    let now = (Date.now() - pre) / 1000;
+    console.log(res, now + 's');
+  </script> -->
+  数据结构版本的lru缓存机制
+  <script>
+    var arr = [];
+    var obj = { objToArr: arr, data: '我是data1号' };
+    arr[0] = { obj };
+    console.log(arr);
+  </script>
+</body>
 
-
-
-
-
-      
-
-      var arr = [];
-      var obj = { objToArr: arr, data: '我是data1号' };
-      arr[0] = { obj };
-      console.log(arr);
-    </script>
-  </body>
 </html>

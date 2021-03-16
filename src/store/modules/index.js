@@ -6,10 +6,12 @@ import * as search from './search'; // 通过别名收到分别暴露的内容
 // 向外暴露包含所有vuex管理的模块的对象
 import * as detail from './detail';
 import * as shopcart from './shopcart';
+import * as user from './user';
 
 export default {
   home,
   search,
   detail,
   shopcart,
+  user,
 };

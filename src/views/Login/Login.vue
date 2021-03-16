@@ -6,45 +6,71 @@
         <div class="loginform">
           <ul class="tab clearFix">
             <li>
-              <a href="##" style="border-right: 0;">扫描登录</a>
+              <a href="##" style="border-right: 0">扫描登录</a>
             </li>
             <li>
               <a href="##" class="current">账户登录</a>
             </li>
           </ul>
 
-          <div class="content">
-            <form action="##">
-              <div class="input-text clearFix">
-                <span></span>
-                <input type="text" placeholder="邮箱/用户名/手机号" />
-              </div>
-              <div class="input-text clearFix">
-                <span class="pwd"></span>
-                <input type="text" placeholder="请输入密码" />
-              </div>
-              <div class="setting clearFix">
-                <label class="checkbox inline">
-                  <input name="m1" type="checkbox" value="2" checked="" />
-                  自动登录
-                </label>
-                <span class="forget">忘记密码？</span>
-              </div>
-              <button class="btn">登&nbsp;&nbsp;录</button>
-            </form>
+          <ValidationObserver v-slot="{ handleSubmit }">
+            <div class="content">
+              <form @submit.prevent="handleSubmit(onSubmit)">
+                <ValidationProvider
+                  class="input-text clearFix"
+                  name="phone"
+                  v-slot="{ errors }"
+                  :rules="`required|phone`"
+                  tag="div"
+                  mode="eager"
+                >
+                  <span></span>
+                  <input
+                    type="text"
+                    v-model="phone"
+                    placeholder="邮箱/用户名/手机号"
+                  />
+                  <i>{{ errors[0] }}</i>
+                </ValidationProvider>
+                <ValidationProvider
+                  class="input-text clearFix"
+                  name="password"
+                  v-slot="{ errors }"
+                  :rules="`required|password`"
+                  tag="div"
+                  mode="eager"
+                >
+                  <span class="pwd"></span>
+                  <input
+                    type="text"
+                    v-model="password"
+                    placeholder="请输入密码"
+                  />
+                  <i>{{ errors[0] }}</i>
+                </ValidationProvider>
+                <div class="setting clearFix">
+                  <label class="checkbox inline">
+                    <input name="m1" type="checkbox" value="2" checked="" />
+                    自动登录
+                  </label>
+                  <span class="forget">忘记密码？</span>
+                </div>
+                <button class="btn">登&nbsp;&nbsp;录</button>
+              </form>
 
-            <div class="call clearFix">
-              <ul>
-                <li><img src="./images/qq.png" alt="" /></li>
-                <li><img src="./images/sina.png" alt="" /></li>
-                <li><img src="./images/ali.png" alt="" /></li>
-                <li><img src="./images/weixin.png" alt="" /></li>
-              </ul>
-              <router-link class="register" to="/register"
-                >立即注册</router-link
-              >
+              <div class="call clearFix">
+                <ul>
+                  <li><img src="./images/qq.png" alt="" /></li>
+                  <li><img src="./images/sina.png" alt="" /></li>
+                  <li><img src="./images/ali.png" alt="" /></li>
+                  <li><img src="./images/weixin.png" alt="" /></li>
+                </ul>
+                <router-link class="register" to="/register"
+                  >立即注册</router-link
+                >
+              </div>
             </div>
-          </div>
+          </ValidationObserver>
         </div>
       </div>
     </div>
@@ -67,8 +93,60 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+import { extend } from 'vee-validate';
+import { required } from 'vee-validate/dist/rules';
+
+const phoneReg = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+const passwordReg = /^[0-9A-Za-z]{6,12}$/;
+
+// 0.必填
+extend('required', {
+  ...required,
+  message: '这是必填项',
+});
+// 2.校验手机号
+extend('phone', {
+  validate(value) {
+    if (phoneReg.test(value)) {
+      return true;
+    }
+    return '输入的手机号不合法,请重新输入';
+  },
+  // message:'输入的手机号不合法,请重新输入',
+});
+// 4.校验密码
+extend('password', {
+  validate(value) {
+    if (passwordReg.test(value)) {
+      return true;
+    }
+    return '请输入6-12位的密码';
+  },
+});
+
 export default {
   name: 'Login',
+  data() {
+    return {
+      phone: '',
+      password: '',
+    };
+  },
+  methods: {
+    ...mapActions(['login']),
+    async onSubmit() {
+      try {
+        const { phone, password } = this;
+        // tip:await会将promise的结果值返回,而promise的返回值就是vuex的promise返回的user
+        const user = await this.login({ phone, password });
+        window.localStorage.setItem('user', JSON.stringify(user));
+        this.$router.history.replace('/');
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  },
 };
 </script>
 

@@ -32,12 +32,13 @@
           >
             <label>验证码:</label>
             <input v-model="code" type="text" placeholder="请输入验证码" />
-            <img
+            <span class="sendCode" @click="sendCode">发送验证码</span>
+            <span class="error-msg">{{ errors[0] }}</span>
+            <!-- <img
               ref="code"
               src="http://39.98.123.211/api/user/passport/code"
               alt="code"
-            />
-            <span class="error-msg">{{ errors[0] }}</span>
+            /> -->
           </ValidationProvider>
           <ValidationProvider
             class="content"
@@ -50,7 +51,7 @@
             <label>登录密码:</label>
             <input
               v-model="password"
-              type="text"
+              type="password"
               placeholder="请输入你的登录密码"
             />
             <span class="error-msg">{{ errors[0] }}</span>
@@ -66,7 +67,7 @@
             <label>确认密码:</label>
             <input
               v-model="rePassword"
-              type="text"
+              type="password"
               placeholder="请输入确认密码"
             />
             <span class="error-msg">{{ errors[0] }}</span>
@@ -110,11 +111,13 @@
 <script>
 import { extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
+import { reqSendCode, reqRegister } from '@/api/user';
 
 // 至少8个字符，至少1个大写字母，1个小写字母和1个数字：
 // const passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const phoneReg = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
-const codeReg = /^[0-9A-Za-z]{4}$/;
+const codeReg = /^[0-9A-Za-z]{6}$/;
+const passwordReg = /^[0-9A-Za-z]{6,12}$/;
 
 // 0.必填
 extend('required', {
@@ -141,7 +144,7 @@ extend('phone', {
 // 3.校验验证码
 extend('code', {
   validate(value) {
-    if (value.length !== 4) {
+    if (value.length !== 6) {
       return '验证码长度为4位';
     }
     if (!codeReg.test(value)) {
@@ -153,8 +156,11 @@ extend('code', {
 });
 // 4.校验密码
 extend('password', {
-  validate() {
-    return true;
+  validate(value) {
+    if (passwordReg.test(value)) {
+      return true;
+    }
+    return "密码不符合规范";
   },
 });
 // 5.校验再次输入密码
@@ -180,8 +186,22 @@ export default {
   },
   methods: {
     // 表单提交方法
-    onSubmit() {
-      console.log('表单提交');
+    // 表单校验通过才会触发
+    async onSubmit() {
+      // tip:如果vuex返回了,vuex中就不需要写catch了,在这里写trycatch
+      try {
+        const { phone, password, code } = this;
+        await this.register({ phone, password, code });
+        this.$router.history.replace('/login');
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async sendCode() {
+      if (this.phone) {
+        const code = await reqSendCode(this.phone);
+        console.log(code);
+      }
     },
   },
 };
@@ -189,6 +209,10 @@ export default {
 
 <style lang="less" scoped>
 .register-container {
+  .send-code {
+    border: 1px solid salmon;
+    padding: 10px;
+  }
   .register {
     width: 1200px;
     height: 445px;
