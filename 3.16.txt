@@ -700,3 +700,36 @@
       };
     </script>
   }
+  #components/Header/Header.vue
+  {
+    <template>
+      <div  class="loginList">
+        <p>尚品汇欢迎您！</p>
+        <div v-if="!username">
+          <span>请</span>
+          <router-link to="/login">登陆</router-link>
+          <router-link class="register" to="/register">免费注册</router-link>
+        </div>
+        <div v-else>
+          <p>{{ username }}</p>&nbsp;&nbsp;&nbsp;
+          <a @click.prevent="logout"> 登出 </a>
+        </div>
+      </div>
+    </template>
+    <script>
+      import {mapState} from 'vuex';
+      export default{
+        computed:{
+          ...mapState({
+            username:(state)=>state.user,name
+          }),
+        },
+        methods:{
+          async logout(){
+            await this.$store.dispatch('logout')
+            window.localStorage.removeItem('user')
+          }
+        }
+      };
+    </script>
+  }

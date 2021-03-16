@@ -3,14 +3,19 @@
     <!-- 头部的第一行 -->
     <div class="top">
       <div class="container">
-        <div class="loginList">
+        <div  class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
+          <div v-if="!username">
             <span>请</span>
             <router-link to="/login">登陆</router-link>
             <router-link class="register" to="/register">免费注册</router-link>
-          </p>
+          </div>
+          <div v-else>
+            <p>{{ username }}</p>&nbsp;&nbsp;&nbsp;
+            <a @click.prevent="logout"> 登出 </a>
+          </div>
         </div>
+
         <div class="typeList">
           <a href="javascript:">我的订单</a>
           <a href="javascript:">我的购物车</a>
@@ -51,6 +56,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'Header',
   data() {
@@ -58,7 +65,11 @@ export default {
       keyword: '',
     };
   },
-
+  computed: {
+    ...mapState({
+      username: (state) => state.user.name,
+    }),
+  },
   methods: {
     /* toSearch() {
       // `/search/${this.keyword}`
@@ -84,6 +95,10 @@ export default {
       }
 
       this.$router.history.push(location);
+    },
+    async logout() {
+      await this.$store.dispatch('logout');
+      window.localStorage.removeItem('user');
     },
   },
 };
