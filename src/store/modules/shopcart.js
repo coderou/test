@@ -2,7 +2,7 @@ import {
   reqGetCartList,
   reqAddCartList,
   reqUpdateCartList,
-  // reqDeleteCartList,
+  reqDeleteCartList,
 } from '@/api/shopcart';
 
 export const state = {
@@ -13,7 +13,10 @@ export const getters = {
   // 1.总价
   totalPrice(state) {
     // reduce查找商品的isChecked为1(转换boolean为true,0为false),添加其Price*num
-    return state.cartList.reduce((p, c) => p + (c.isChecked ? c.skuPrice * c.skuNum : 0), 0);
+    return state.cartList.reduce(
+      (p, c) => p + (c.isChecked ? c.skuPrice * c.skuNum : 0),
+      0,
+    );
   },
   // 2.已选商品的数量
   checkedNum(state) {
@@ -59,6 +62,12 @@ export const actions = {
       commit('UPDATE_CART_LIST', { skuId, isChecked });
     });
   },
+  // 4.删除购物车某商品
+  deleteCartList({ commit }, skuId) {
+    reqDeleteCartList(skuId).then(() => {
+      commit('DELETE_CART_LIST', skuId);
+    });
+  },
 };
 
 export const mutations = {
@@ -71,5 +80,11 @@ export const mutations = {
     const cart = state.cartList.find((cart) => cart.skuId === skuId);
     // 更新isChecked
     cart.isChecked = isChecked;
+  },
+  DELETE_CART_LIST(state, skuId) {
+    state.cartList = state.cartList.filter((cart) => {
+      console.log(cart.skuId, skuId);
+      return cart.skuId !== skuId;
+    });
   },
 };

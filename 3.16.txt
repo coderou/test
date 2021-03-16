@@ -138,6 +138,43 @@
       };
     </script>
   }
+4.完成商品删除:
+  #store/modules/shopcart.js
+  {
+    import {reqDeleteCartList} from '@/api/shopcart';
+
+    export const actions={
+      // 4.删除购物车某商品
+      deleteCartList({ commit }, skuId) {
+        reqDeleteCartList(skuId).then(() => {
+          commit('DELETE_CART_LIST', skuId);
+        });
+      },
+    };
+
+    export const mutations={
+      DELETE_CART_LIST(state, skuId) {
+        state.cartList = state.cartList.filter((cart) => {
+          console.log(cart.skuId, skuId);
+          return cart.skuId !== skuId;
+        });
+      },
+    }
+  }
+  #views/ShopCart/ShopCart.vue
+  {
+    <template>
+      <a href="#none" class="sindelet" @click.prevent="deleteCartList(cart.skuId)">删除</a>
+    </template>
+    <script>
+      export default{
+        methods:{
+          ...mapActions(['deleteCartList']),
+        }
+      }
+    </script>
+  }
+5.
 
 
 

@@ -65,7 +65,7 @@
             <span class="sum">{{ cart.skuNum }}</span>
           </li>
           <li class="cart-list-con7">
-            <a href="#none" class="sindelet">删除</a>
+            <a href="#none" class="sindelet" @click.prevent="deleteCartList(cart.skuId)">删除</a>
             <br />
             <a href="#none">移到收藏</a>
           </li>
@@ -116,7 +116,7 @@ export default {
     ...mapGetters(['totalPrice', 'checkedNum', 'isCheckAll']),
   },
   methods: {
-    ...mapActions(['getCartList', 'updateCartList']),
+    ...mapActions(['getCartList', 'updateCartList', 'deleteCartList']),
     handleChecked(skuId, isChecked) {
       // isChecked 值为1或0
       // tip:直接取反是因为你要改变的就是现在的取反
