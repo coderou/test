@@ -3,16 +3,17 @@
     <!-- 头部的第一行 -->
     <div class="top">
       <div class="container">
-        <div  class="loginList">
+        <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <div v-if="!username">
+          <div v-if="username">
+            <p>{{ username }}</p>
+            &nbsp;&nbsp;&nbsp;
+            <a @click.prevent="logout"> 登出 </a>
+          </div>
+          <div v-else>
             <span>请</span>
             <router-link to="/login">登陆</router-link>
             <router-link class="register" to="/register">免费注册</router-link>
-          </div>
-          <div v-else>
-            <p>{{ username }}</p>&nbsp;&nbsp;&nbsp;
-            <a @click.prevent="logout"> 登出 </a>
           </div>
         </div>
 
@@ -67,7 +68,7 @@ export default {
   },
   computed: {
     ...mapState({
-      username: (state) => state.user.name,
+      username: (state) => state.user.user.name,
     }),
   },
   methods: {
@@ -118,7 +119,7 @@ export default {
 
       .loginList {
         float: left;
-
+        width: 250px;
         p {
           float: left;
           margin-right: 10px;

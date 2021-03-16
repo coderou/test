@@ -191,7 +191,7 @@ export default {
       // tip:如果vuex返回了,vuex中就不需要写catch了,在这里写trycatch
       try {
         const { phone, password, code } = this;
-        await this.register({ phone, password, code });
+        await reqRegister({ phone, password, code });
         this.$router.history.replace('/login');
       } catch (e) {
         console.log(e);
