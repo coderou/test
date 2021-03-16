@@ -58,6 +58,7 @@ export const actions = {
   },
   // 3.更新购物车某商品状态
   updateCartList({ commit }, { skuId, isChecked }) {
+    // console.log(skuId, isChecked);
     reqUpdateCartList(skuId, isChecked).then(() => {
       commit('UPDATE_CART_LIST', { skuId, isChecked });
     });
@@ -66,6 +67,22 @@ export const actions = {
   deleteCartList({ commit }, skuId) {
     reqDeleteCartList(skuId).then(() => {
       commit('DELETE_CART_LIST', skuId);
+    });
+  },
+  // 5.更新全部商品状态
+  updateAllCartList({ commit }, { idArr, isCheckAll }) {
+    // console.log(idArr, isCheckAll);
+    const requestArr = [];
+    idArr.forEach((skuId) => {
+      requestArr.push(reqUpdateCartList(skuId, isCheckAll));
+    });
+    /* idArr.forEach((skuId) => {
+      reqUpdateCartList(skuId, isCheckAll).then((res) => {
+        console.log(res);
+      });
+    }); */
+    Promise.all(requestArr).then(() => {
+      commit('UPDATE_ALL_CART_LIST', isCheckAll);
     });
   },
 };
@@ -85,6 +102,11 @@ export const mutations = {
     state.cartList = state.cartList.filter((cart) => {
       console.log(cart.skuId, skuId);
       return cart.skuId !== skuId;
+    });
+  },
+  UPDATE_ALL_CART_LIST(state, isCheckAll) {
+    state.cartList.forEach((i) => {
+      i.isChecked = isCheckAll;
     });
   },
 };

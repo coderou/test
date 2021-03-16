@@ -174,7 +174,63 @@
       }
     </script>
   }
-5.
+5.完成商品全选操作:
+  #views/ShopCart/ShopCart.vue
+  {
+    <template>
+      <input
+        class="chooseAll"
+        :checked="isCheckAll"
+        @change="handleCheckALl(!isCheckAll)"
+        type="checkbox"
+      />
+      <span>全选</span>
+    </template>
+    <script>
+      export default{
+        methods:{
+          ...maActions(['updateAllCartList'])
+        },
+        handleCheckALl(isCheckAll) {
+          const idArr = [];
+          // 变量当前cartList的所有cart,如果cart.isChecked !== isCheckAll[目标修改值],说明需要修改
+          this.cartList.forEach((cart) => {
+            if (!!cart.isChecked !== isCheckAll) {
+              idArr.push(cart.skuId);
+            }
+          });
+          // tip:是0/1不是false/true
+          isCheckAll = isCheckAll ? 1 : 0;
+          this.updateAllCartList({ idArr, isCheckAll });
+        },
+      }
+    </script>
+  }
+  #store/modules/shopcart.js
+  {
+    export const actions={
+      // 5.更新全部商品状态
+      updateAllCartList({ commit }, { idArr, isCheckAll }) {
+        // console.log(idArr, isCheckAll);
+        const requestArr = [];
+        idArr.forEach((skuId) => {
+          requestArr.push(reqUpdateCartList(skuId, isCheckAll));
+        });
+        Promise.all(requestArr).then(() => {
+          commit('UPDATE_ALL_CART_LIST', isCheckAll);
+        });
+      },
+    };
+
+    export const mutations={
+      UPDATE_ALL_CART_LIST(state, isCheckAll) {
+        state.cartList.forEach((i) => {
+          i.isChecked = isCheckAll;
+        });
+      },
+    }
+  }
+6.
 
 
 

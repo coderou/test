@@ -65,7 +65,12 @@
             <span class="sum">{{ cart.skuNum }}</span>
           </li>
           <li class="cart-list-con7">
-            <a href="#none" class="sindelet" @click.prevent="deleteCartList(cart.skuId)">删除</a>
+            <a
+              href="#none"
+              class="sindelet"
+              @click.prevent="deleteCartList(cart.skuId)"
+              >删除</a
+            >
             <br />
             <a href="#none">移到收藏</a>
           </li>
@@ -77,7 +82,7 @@
         <input
           class="chooseAll"
           :checked="isCheckAll"
-          @change="handleCheckALl"
+          @change="handleCheckALl(!isCheckAll)"
           type="checkbox"
         />
         <span>全选</span>
@@ -116,13 +121,29 @@ export default {
     ...mapGetters(['totalPrice', 'checkedNum', 'isCheckAll']),
   },
   methods: {
-    ...mapActions(['getCartList', 'updateCartList', 'deleteCartList']),
+    ...mapActions([
+      'getCartList',
+      'updateCartList',
+      'deleteCartList',
+      'updateAllCartList',
+    ]),
     handleChecked(skuId, isChecked) {
       // isChecked 值为1或0
       // tip:直接取反是因为你要改变的就是现在的取反
       this.updateCartList({ skuId, isChecked: isChecked ? 1 : 0 });
     },
-    handleCheckALl() {},
+    handleCheckALl(isCheckAll) {
+      const idArr = [];
+      // 变量当前cartList的所有cart,如果cart.isChecked !== isCheckAll[目标修改值],说明需要修改
+      this.cartList.forEach((cart) => {
+        if (!!cart.isChecked !== isCheckAll) {
+          idArr.push(cart.skuId);
+        }
+      });
+      // tip:是0/1不是false/true
+      isCheckAll = isCheckAll ? 1 : 0;
+      this.updateAllCartList({ idArr, isCheckAll });
+    },
   },
   mounted() {
     this.getCartList();
