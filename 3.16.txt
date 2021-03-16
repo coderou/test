@@ -175,6 +175,30 @@
     </script>
   }
 5.完成商品全选操作:
+  #store/modules/shopcart.js
+  {
+    export const actions={
+      // 5.更新全部商品状态
+      updateAllCartList({ commit }, { idArr, isCheckAll }) {
+        // console.log(idArr, isCheckAll);
+        const requestArr = [];
+        idArr.forEach((skuId) => {
+          requestArr.push(reqUpdateCartList(skuId, isCheckAll));
+        });
+        Promise.all(requestArr).then(() => {
+          commit('UPDATE_ALL_CART_LIST', isCheckAll);
+        });
+      },
+    };
+
+    export const mutations={
+      UPDATE_ALL_CART_LIST(state, isCheckAll) {
+        state.cartList.forEach((i) => {
+          i.isChecked = isCheckAll;
+        });
+      },
+    }
+  }
   #views/ShopCart/ShopCart.vue
   {
     <template>
@@ -206,31 +230,50 @@
       }
     </script>
   }
+6.完成商品删除选中操作:
   #store/modules/shopcart.js
   {
     export const actions={
-      // 5.更新全部商品状态
-      updateAllCartList({ commit }, { idArr, isCheckAll }) {
-        // console.log(idArr, isCheckAll);
+      // 6.删除选中商品
+      deletePartCartList({ commit }, idArr) {
         const requestArr = [];
         idArr.forEach((skuId) => {
-          requestArr.push(reqUpdateCartList(skuId, isCheckAll));
+          requestArr.push(reqDeleteCartList(skuId));
         });
         Promise.all(requestArr).then(() => {
-          commit('UPDATE_ALL_CART_LIST', isCheckAll);
+          commit('DELETE_PART_CART_LIST');
         });
       },
     };
 
     export const mutations={
-      UPDATE_ALL_CART_LIST(state, isCheckAll) {
-        state.cartList.forEach((i) => {
-          i.isChecked = isCheckAll;
-        });
+      DELETE_PART_CART_LIST(state) {
+        state.cartList = state.cartList.filter((i) => !i.isChecked);
       },
-    }
+    };
   }
-6.
+  #views/ShopCart/ShopCart.vue
+  {
+    <template>
+      <a href="#none" @click.prevent="handleDeletePart">删除选中的商品</a>
+    </template>
+    <script>
+      export default{
+        methods:{
+          ...maoActions(['deletePartCartList']),
+          handleDeletePart() {
+            const idArr = [];
+            this.cartList.forEach((cart) => {
+              if (cart.isChecked) {
+                idArr.push(cart.skuId);
+              }
+            });
+            this.deletePartCartList(idArr);
+          },
+        }
+      }
+    </script>
+  }
 
 
 

@@ -71,18 +71,22 @@ export const actions = {
   },
   // 5.更新全部商品状态
   updateAllCartList({ commit }, { idArr, isCheckAll }) {
-    // console.log(idArr, isCheckAll);
     const requestArr = [];
     idArr.forEach((skuId) => {
       requestArr.push(reqUpdateCartList(skuId, isCheckAll));
     });
-    /* idArr.forEach((skuId) => {
-      reqUpdateCartList(skuId, isCheckAll).then((res) => {
-        console.log(res);
-      });
-    }); */
     Promise.all(requestArr).then(() => {
       commit('UPDATE_ALL_CART_LIST', isCheckAll);
+    });
+  },
+  // 6.删除选中商品
+  deletePartCartList({ commit }, idArr) {
+    const requestArr = [];
+    idArr.forEach((skuId) => {
+      requestArr.push(reqDeleteCartList(skuId));
+    });
+    Promise.all(requestArr).then(() => {
+      commit('DELETE_PART_CART_LIST');
     });
   },
 };
@@ -108,5 +112,8 @@ export const mutations = {
     state.cartList.forEach((i) => {
       i.isChecked = isCheckAll;
     });
+  },
+  DELETE_PART_CART_LIST(state) {
+    state.cartList = state.cartList.filter((i) => !i.isChecked);
   },
 };

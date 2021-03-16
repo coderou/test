@@ -88,7 +88,7 @@
         <span>全选</span>
       </div>
       <div class="option">
-        <a href="#none">删除选中的商品</a>
+        <a href="#none" @click.prevent="handleDeletePart">删除选中的商品</a>
         <a href="#none">移到我的关注</a>
         <a href="#none">清除下柜商品</a>
       </div>
@@ -126,6 +126,7 @@ export default {
       'updateCartList',
       'deleteCartList',
       'updateAllCartList',
+      'deletePartCartList',
     ]),
     handleChecked(skuId, isChecked) {
       // isChecked 值为1或0
@@ -143,6 +144,15 @@ export default {
       // tip:是0/1不是false/true
       isCheckAll = isCheckAll ? 1 : 0;
       this.updateAllCartList({ idArr, isCheckAll });
+    },
+    handleDeletePart() {
+      const idArr = [];
+      this.cartList.forEach((cart) => {
+        if (cart.isChecked) {
+          idArr.push(cart.skuId);
+        }
+      });
+      this.deletePartCartList(idArr);
     },
   },
   mounted() {
