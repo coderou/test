@@ -1,20 +1,20 @@
 import request from "./request";
 
-// 1.获取所有订单列表
+// 1.Center.vue-获取所有订单列表
 export const reqGetOrderList = (page, limit) =>
   request({
     method: "GET",
     url: `/order/auth/${page}/${limit}`,
   });
 
-// 2.获取当前用户的订单信息
+// 2.Trade.vue-获取当前用户的订单信息
 export const reqGetOrder = () =>
   request({
     method: "GET",
     url: `/order/auth/trade`,
   });
 
-// 3.提交订单
+// 3.Trade.vue-提交订单
 export const reqSubmitOrder = ({
   tradeNo,
   consigneeTel,
@@ -38,14 +38,14 @@ export const reqSubmitOrder = ({
     },
   });
 
-// 4.获取订单的支付信息
+// 4.Pay.vue获取订单的支付信息
 export const reqGetPayInfo = (orderId) =>
   request({
     method: "GET",
     url: `/payment/weixin/createNative/${orderId}`, // 支付订单ID (通过提交订单得到)
   });
 
-// 5.查询的支付状态
+// 5.PaySuccess.vue-查询的支付状态
 export const reqGetPayStatus = (orderId) =>
   request({
     method: "GET",

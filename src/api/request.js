@@ -10,6 +10,8 @@
     4.设置进度条
     5.处理跨域
 */
+// eslint-disable-next-line import/no-cycle
+import store from '@/store';
 import axios from 'axios';
 import NProgress from 'nprogress'; // 引入JS
 import 'nprogress/nprogress.css'; // 引入css
@@ -31,6 +33,10 @@ request.interceptors.request.use((config) => {
   NProgress.start();
   // 设置公共请求数据
   config.headers.userTempId = getUuid();// ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
+  const { token } = store.state.user.user;
+  if (token) {
+    config.headers.token = token;
+  }
   return config;
 });
 

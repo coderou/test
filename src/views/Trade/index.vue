@@ -125,8 +125,14 @@
 </template>
 
 <script>
+import { reqGetOrder } from '@/api/pay.js';
+
 export default {
   name: 'Trade',
+  async mounted() {
+    const res = await reqGetOrder();
+    console.log(res);
+  },
 };
 </script>
 

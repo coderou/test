@@ -191,4 +191,16 @@
         url: `payment/weixin/queryPayStatus/${orderId}`, // 支付订单ID (通过提交订单得到)
       });
   }
-  #
+  #api/request.js(bugfix,登录请求header携带token)
+  {
+    // eslint-disable-next-line import/no-cycle
+    import store from '@/store';
+    request.interceptors.request.use((config)=>{
+      const {token}=store.state.user.user;
+      if(token){
+        config.headers.token=token;
+      }
+      return config;
+    })
+  }
+9.
