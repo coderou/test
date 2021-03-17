@@ -11,11 +11,15 @@
         <div class="paymark">
           <span class="fl"
             >请您在提交订单<em class="orange time">4小时</em
-            >之内完成支付，超时订单会自动取消。订单号：<em>145687</em></span
+            >之内完成支付，超时订单会自动取消。订单号：<em>{{
+              $route.query.orderId
+            }}</em></span
           >
           <span class="fr"
             ><em class="lead">应付金额：</em
-            ><em class="orange money">￥17,654</em></span
+            ><em class="orange money"
+              >￥{{ $route.query.totalAmount }}</em
+            ></span
           >
         </div>
       </div>
@@ -72,9 +76,33 @@
           </div>
         </div>
         <div class="hr"></div>
-
+        <!-- 🍟🍟???,30%宽度,居中 -->
+        <el-dialog :visible.sync="visible" width="30%" center>
+          <div
+            :style="{
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }"
+          >
+            <!-- 图片通过QRCode插件生成 -->
+            <img :src="url" alt="QRCode" />
+          </div>
+          <span slot="footer" class="dialog-footer">
+            <el-button size="small" @click="visible = false"
+              >支付遇到问题</el-button
+            >
+            <el-button size="small" type="primary" @click="visible = false">
+              我已支付成功
+            </el-button>
+          </span>
+        </el-dialog>
         <div class="submit">
-          <router-link class="btn" to="/paysuccess">立即支付</router-link>
+          <!-- 点击处理获取支付验证码 -->
+          <button class="btn" @click="getQRCode">
+            立即支付
+          </button>
         </div>
         <div class="otherpay">
           <div class="step-tit">
@@ -91,8 +119,58 @@
 </template>
 
 <script>
+import QRCode from 'qrcode';
+// 请求支付信息,请求支付二维码地址
+import { reqGetPayInfo, reqGetPayStatus } from '@/api/pay.js';
+
 export default {
   name: 'Pay',
+  data() {
+    return {
+      visible: false, // 对应按钮,默认不可点击
+      url: '', // 对应二维码图片地址(拿到的地址是字符串,需要通过QRCode转化为二维码)
+    };
+  },
+  // 组件守卫[如果pay从Trade跳转,不管,否则跳回Center(其实也可以用路由守卫)]
+  beforeRouteEnter(to, from, next) {
+    if (from.name === 'Trade') {
+      next();
+      return;
+    }
+    next({ name: 'Center' });
+  },
+  methods: {
+    // FN:获取二维码,设置图片url,设置
+    async getQRCode() {
+      const res = await reqGetPayInfo(this.$route.query.orderId);
+      // console.log(res); // 改订单需要的支付码等信息
+      /*
+        codeUrl: "weixin://wxpay/bizpayurl?pr=dbS0FPdzz"
+        orderId: 2214
+        resultCode: "SUCCESS"
+        totalFee: 2598
+      */
+      const url = await QRCode.toDataURL(res.codeUrl);
+      this.getOrderStatus(); // 调用FN:获取支付是否成功的函数
+      this.url = url; // 设置二维码图片的地址
+      this.visible = true; // 可以点击弹出框的按钮
+    },
+    // FN:获取支付是否成功的函数(每隔一段事件调用一次,确认支付结果,如果结果成功,跳转到paysuccess)
+    getOrderStatus() {
+      this.timeId = setInterval(async () => {
+        // 支付成功,返回成功的promise
+        // 支付中,会返回失败的promise
+        // async函数特点:成功,向下执行,失败,直接退出async函数,不会向下执行
+        await reqGetPayStatus(this.$route.query.orderId);
+        // 支付成功,清空
+        // clearInterval(this.timeId);
+        this.$router.history.push('/paysuccess');
+      }, 3000);
+    },
+  },
+  beforeDestroy() {
+    clearInterval(this.timeId);
+  },
 };
 </script>
 

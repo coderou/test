@@ -3,28 +3,19 @@
     <h3 class="title">填写并核对订单信息</h3>
     <div class="content">
       <h5 class="receive">收件人信息</h5>
-      <div class="address clearFix">
-        <span class="username selected">张三</span>
+      <div
+        class="address clearFix"
+        v-for="userAddress in userAddressList"
+        :key="userAddress.id"
+        @click="selectAddress(userAddress.id)"
+      >
+        <span :class="{ username: true, selected: userAddress.isChecked }">{{
+          userAddress.name
+        }}</span>
         <p>
-          <span class="s1">北京市昌平区宏福科技园综合楼6层</span>
-          <span class="s2">15010658793</span>
-          <span class="s3">默认地址</span>
-        </p>
-      </div>
-      <div class="address clearFix">
-        <span class="username selected">李四</span>
-        <p>
-          <span class="s1">北京市昌平区宏福科技园综合楼6层</span>
-          <span class="s2">13590909098</span>
-          <span class="s3">默认地址</span>
-        </p>
-      </div>
-      <div class="address clearFix">
-        <span class="username selected">王五</span>
-        <p>
-          <span class="s1">北京市昌平区宏福科技园综合楼6层</span>
-          <span class="s2">18012340987</span>
-          <span class="s3">默认地址</span>
+          <span class="s1">{{ userAddress.address }}</span>
+          <span class="s2">{{ userAddress.phone }}</span>
+          <span class="s3" v-if="userAddress.isDefault">默认地址</span>
         </p>
       </div>
       <div class="line"></div>
@@ -44,38 +35,24 @@
       </div>
       <div class="detail">
         <h5>商品清单</h5>
-        <ul class="list clearFix">
+        <ul class="list clearFix" v-for="detail in detailList" :key="detail.id">
           <li>
-            <img src="./images/goods.png" alt="" />
+            <img
+              :src="detail.imgUrl"
+              alt="商品图片"
+              :style="{ width: '100px', height: '100px' }"
+            />
           </li>
           <li>
             <p>
-              Apple iPhone 6s (A1700) 64G 玫瑰金色
-              移动联通电信4G手机硅胶透明防摔软壳 本色系列
+              {{ detail.skuName }}
             </p>
             <h4>7天无理由退货</h4>
           </li>
           <li>
-            <h3>￥5399.00</h3>
+            <h3>￥{{ detail.orderPrice }}</h3>
           </li>
-          <li>X1</li>
-          <li>有货</li>
-        </ul>
-        <ul class="list clearFix">
-          <li>
-            <img src="./images/goods.png" alt="" />
-          </li>
-          <li>
-            <p>
-              Apple iPhone 6s (A1700) 64G 玫瑰金色
-              移动联通电信4G手机硅胶透明防摔软壳 本色系列
-            </p>
-            <h4>7天无理由退货</h4>
-          </li>
-          <li>
-            <h3>￥5399.00</h3>
-          </li>
-          <li>X1</li>
+          <li>X{{ detail.skuNum }}</li>
           <li>有货</li>
         </ul>
       </div>
@@ -96,8 +73,11 @@
     <div class="money clearFix">
       <ul>
         <li>
-          <b><i>1</i>件商品，总商品金额</b>
-          <span>¥5399.00</span>
+          <b
+            ><i>{{ totalNum }}</i
+            >件商品，总商品金额</b
+          >
+          <span>¥{{ totalAmount }}</span>
         </li>
         <li>
           <b>返现：</b>
@@ -110,28 +90,132 @@
       </ul>
     </div>
     <div class="trade">
-      <div class="price">应付金额:<span>¥5399.00</span></div>
+      <div class="price">
+        应付金额:<span>¥{{ totalAmount }}</span>
+      </div>
       <div class="receiveInfo">
         寄送至:
-        <span>北京市昌平区宏福科技园综合楼6层</span>
-        收货人：<span>张三</span>
-        <span>15010658793</span>
+        <!-- 通过计算属性得到的实时选择地址 -->
+        <span>{{ address.address }}</span>
+        收货人：<span>{{ address.name }}</span>
+        <span>{{ address.phone }}</span>
       </div>
     </div>
     <div class="sub clearFix">
-      <router-link class="subBtn" to="/pay">提交订单</router-link>
+      <!-- <router-link class="subBtn" to="/trade">提交订单</router-link> -->
+      <button class="subBtn" @click="submitOrder">提交订单</button>
     </div>
   </div>
 </template>
 
 <script>
-import { reqGetOrder } from '@/api/pay.js';
+// 导入{请求订单数据函数,提交订单函数}
+import { reqGetOrder, reqSubmitOrder } from '@/api/pay.js';
 
 export default {
   name: 'Trade',
+  data() {
+    return {
+      detailList: [], // 商品详情数据
+      totalAmount: 0, // 商品总金额
+      totalNum: 0, // 商品总数量
+      tradeNo: '', // 购物车订单编号
+      userAddressList: [], // 用户收货地址
+      orderComment: '', // 订单备注
+    };
+  },
   async mounted() {
+    // 1.拿到订单数据
     const res = await reqGetOrder();
-    console.log(res);
+    // console.log(res);
+    // 2.初始化数据
+    this.detailList = res.detailArrayList; // 商品详情列表
+    this.totalAmount = res.totalAmount;
+    this.totalNum = res.totalNum; // 总数
+    this.tradeNo = res.tradeNo; // 订单编号
+    this.userAddressList = res.userAddressList || [
+      {
+        id: 1, // 编号(用于遍历)
+        name: '沛华', // 收货人
+        address: '草围爱情公寓', // 地址
+        phone: '13800000000', // 电话号码
+        isChecked: true, // 用户选中
+        isDefault: true, // 默认值
+      },
+      {
+        id: 2,
+        name: '静哥',
+        address: '草围单身公寓',
+        phone: '13811111111',
+        isChecked: false,
+        isDefault: false,
+      },
+      {
+        id: 3,
+        name: '雷哥',
+        address: '草围老年公寓',
+        phone: '13822222222',
+        isChecked: false,
+        isDefault: false,
+      },
+    ];
+  },
+  computed: {
+    // COM:当前选中是哪个地址
+    address() {
+      // 找到那个isChecked为true的地址,或者为空(一上来会报错,赋值空以解决)
+      return this.userAddressList.find((address) => address.isChecked) || {};
+    },
+  },
+  methods: {
+    // FN:选择收货地址的函数
+    selectAddress(id) {
+      this.userAddressList.forEach((userAddress) => {
+        // 遍历所有用户地址,判断是当前点选的地址,更改isChecked
+        if (userAddress.id === id) {
+          userAddress.isChecked = true;
+          return;
+        }
+        // 如果不是,改为false
+        userAddress.isChecked = false;
+      });
+    },
+    // FN:🍟🍟🍟提交订单的函数
+    async submitOrder() {
+      // 1.从this中获取数据
+      const {
+        tradeNo, // 订单编号
+        orderComment, // 备注
+        detailList: orderDetailList, // 商品列表
+        totalAmount, // 总价(通过路由传递给pay.vue)
+      } = this;
+      // 2.从计算属性中拿数据(拿到的同时重命名)
+      const {
+        name: consigne, // 收货人
+        phone: consigneeTel, // 收货人电话号码
+        address: deliveryAddress, // 收货人地址
+      } = this.address;
+      // 3.支付方式目前只支持线上
+      const paymentWay = 'ONLINE'; // 目前只支持线上
+      // 4.发送请求,orderId:订单编号(通过路由传递给pay.vue)
+      const orderId = await reqSubmitOrder({
+        tradeNo,
+        orderComment,
+        deliveryAddress,
+        paymentWay,
+        orderDetailList,
+        consigne,
+        consigneeTel,
+      });
+      // 5.请求成功,跳转到pay.vue,路由query携带id和总价
+      this.$router.history.push({
+        name: 'Pay',
+        query: {
+          orderId,
+          totalAmount,
+        },
+      });
+    },
   },
 };
 </script>

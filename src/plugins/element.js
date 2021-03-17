@@ -1,4 +1,5 @@
 import Vue from 'vue';
-import { Pagination } from 'element-ui';
+import { Dialog, Button } from 'element-ui';
 
-Vue.use(Pagination);
+Vue.use(Dialog);
+Vue.use(Button);

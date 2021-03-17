@@ -35,6 +35,8 @@ request.interceptors.request.use((config) => {
   config.headers.userTempId = getUuid();// ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
   const { token } = store.state.user.user;
   if (token) {
+    // config.headers.userTempId = '';
+    delete config.headers.userTempId;
     config.headers.token = token;
   }
   return config;

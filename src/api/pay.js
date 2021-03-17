@@ -23,8 +23,15 @@ export const reqSubmitOrder = ({
   deliveryAddress,
   paymentWay,
   consigne,
-}) =>
-  request({
+}) => {
+  console.log(tradeNo,
+    consigneeTel,
+    orderDetailList,
+    orderComment,
+    deliveryAddress,
+    paymentWay,
+    consigne);
+  return request({
     method: "POST",
     url: `/order/auth/submitOrder`,
     params: { tradeNo }, // query参数
@@ -37,6 +44,7 @@ export const reqSubmitOrder = ({
       orderDetailList, // 存储多个商品对象的数组
     },
   });
+};
 
 // 4.Pay.vue获取订单的支付信息
 export const reqGetPayInfo = (orderId) =>

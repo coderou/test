@@ -47,7 +47,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this);
+    // console.log(this);
   },
   watch: {
     newValue(newVal, oldVal) {
@@ -95,7 +95,7 @@ export default {
         // this.$emit("input", this.newValue);
         // return
       }
-      finalVal.Math.ceil(finalVal);// 用户数输入小数取整
+      finalVal = Math.ceil(finalVal); // 用户数输入小数取整
       this.newValue = finalVal;
       this.$emit('input', finalVal);
     },

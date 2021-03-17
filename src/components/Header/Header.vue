@@ -8,7 +8,7 @@
           <div v-if="username">
             <p>{{ username }}</p>
             &nbsp;&nbsp;&nbsp;
-            <a @click.prevent="logout"> 登出 </a>
+            <a @click.prevent="logout"> 退出登录 </a>
           </div>
           <div v-else>
             <span>请</span>
@@ -18,7 +18,7 @@
         </div>
 
         <div class="typeList">
-          <a href="javascript:">我的订单</a>
+          <router-link to="/center">我的订单</router-link>
           <router-link to="/shopcart">我的购物车</router-link>
           <a href="javascript:">我的尚品汇</a>
           <a href="javascript:">尚品汇会员</a>
@@ -72,16 +72,6 @@ export default {
     }),
   },
   methods: {
-    /* toSearch() {
-      // `/search/${this.keyword}`
-      this.$router.history.push({
-        name: 'Search',
-        params: {
-          keyword: this.keyword,
-          //如果有参数,没问题,如果没参数,是undefined,有问题,即,params如果写了,必须必须必须有值,不能是undefined
-        },
-      });
-    }, */
     toSearch() {
       const { keyword } = this;
       const { query } = this.$route;
@@ -100,6 +90,8 @@ export default {
     async logout() {
       await this.$store.dispatch('logout');
       window.localStorage.removeItem('user');
+      // 推出登录后重新跳转到首页[无论是哪个页面]
+      this.$router.history.replace('/');
     },
   },
 };

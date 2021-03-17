@@ -141,7 +141,9 @@ export default {
         // tip:await会将promise的结果值返回,而promise的返回值就是vuex的promise返回的user
         const user = await this.login({ phone, password });
         window.localStorage.setItem('user', JSON.stringify(user));
-        this.$router.history.replace('/');
+        // tip:登录的时候判断是否是从其他页面跳转过来的[F4],如果有,跳转回去,如果没有,首页走你
+        const redirect = this.$route.query.redirect || '/';
+        this.$router.history.replace(redirect);
       } catch (e) {
         console.log(e);
       }

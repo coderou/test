@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import {
   reqGetCartList,
   reqAddCartList,
@@ -33,7 +34,22 @@ export const actions = {
   getCartList({ commit }) {
     return reqGetCartList()
       .then((cartList) => {
-        commit('GET_CART_LIST', cartList[0].cartInfoList);
+        console.log(cartList);
+        // coderou代码
+        if (cartList[0]) {
+          const cartArr = [];
+          cartList.forEach((i) => {
+            i.cartInfoList.forEach((j) => {
+              cartArr.push(j);
+            });
+          });
+          console.log(cartArr);
+          commit('GET_CART_LIST', cartArr);
+        }
+        // 熊代码
+        /* if (cartList[0]) {
+          commit('GET_CART_LIST', cartList[0].cartInfoList);
+        } */
       })
       .catch((message) => {
         console.log(message);
@@ -95,7 +111,7 @@ export const mutations = {
   GET_CART_LIST(state, cartList) {
     state.cartList = cartList;
   },
-  ADD_CART_LIST() {},
+  ADD_CART_LIST() { },
   UPDATE_CART_LIST(state, { skuId, isChecked }) {
     // 找到符合Id的购物车cart商品
     const cart = state.cartList.find((cart) => cart.skuId === skuId);

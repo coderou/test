@@ -3,6 +3,7 @@ import { ValidationObserver, ValidationProvider } from 'vee-validate';
 // import Carousel from './components/Carousel/index.vue';
 import Carousel from '@/components/Carousel';
 import TypeNav from '@/components/TypeNav/index.vue';
+import Pagination from '@/components/Pagination';
 import App from '@/App.vue';
 import router from '@/router';
 import store from '@/store';
@@ -19,13 +20,14 @@ if (process.env.NODE_ENV === 'development') {
 }
 /* eslint-enable */
 
-Vue.config.productionTip = false;
 // 注册全局组件
 Vue.component('TypeNav', TypeNav);
 Vue.component('Carousel', Carousel);
 Vue.component('ValidationObserver', ValidationObserver);
 Vue.component('ValidationProvider', ValidationProvider);
+Vue.component('Pagination', Pagination);
 
+Vue.config.productionTip = false;
 // 添加全局事件总线对象
 Vue.prototype.$bus = new Vue();
 new Vue({

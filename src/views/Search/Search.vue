@@ -138,7 +138,7 @@
               :total="total"
             ></el-pagination> -->
 
-            <Patination
+            <Pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="options.pageNo"
@@ -158,7 +158,7 @@
 import { mapGetters, mapActions } from 'vuex';
 // import _ from 'lodash';// 完整引入,打包体积大
 import debounce from 'lodash/debounce';// 单独引入
-import Patination from '@/components/Pagination';
+// import Pagination from '@/components/Pagination';
 import SearchSelector from './SearchSelector/SearchSelector';
 
 export default {
@@ -190,7 +190,7 @@ export default {
   },
   components: {
     SearchSelector,
-    Patination,
+    // Pagination,
   },
   computed: {
     ...mapGetters(['goodsList', 'total']),

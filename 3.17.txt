@@ -203,4 +203,647 @@
       return config;
     })
   }
-9.
+9.麻烦了,出现了神奇的bug,添加购物车后,前一个商品不会展示,但是数据库还是有,删除商品后,就会出现
+  解决了,是因为token和uuid的冲突问题
+    request.interceptors.request.use((config) => {
+      NProgress.start();
+      // 设置公共请求数据
+      config.headers.userTempId = getUuid();// ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
+      const { token } = store.state.user.user;
+      if (token) {
+        // config.headers.userTempId = '';
+        delete config.headers.userTempId;
+        config.headers.token = token;
+      }
+      return config;
+    });
+10.购物车trade思路
+  1.Header.vue跳转各大页面
+  2.Center.vue mounted请求数据,展示数据
+    定义分页数据currentPage,pageSize
+    保存total,orderList
+    tip:total至少是1条
+    遍历records,template显示
+    使用全局注册的Pagination组件
+    bug:解决了
+  3.trade页面
+    tip:auth:授权的
+    1.必须要登录才能跳转,包括pay,paysuccess,center
+    2.路由导航守卫:路由的生命周期函数
+      当:你没有登录,但是你访问了个人中心,这时被跳转到登录,然后登录了,你要回到个人中心
+      router.beforeEach((to,form,next)=>{/* 必须调用next*/})
+      router.beforeResolve((to,from,next)=>{/* 必须盗用next*/})
+      router.afterEach((to,from)=>{})
+    3.这里有4个都要进行守卫,首页用全局守卫->全局前置守卫
+    4.在router.js设置全局路由守卫,登录过\页面不需要登录,直接跳转,否则跳转到登录
+    5.重定向到login的时候,加一个字符串表示自己从哪里来的
+    6.login.js 跳转的时候,先确定有没有query,如果有就用,没有就'/'
+    7.Header.vue中推出登录,跳转到首页
+    8.支付成功页面,添加单独的路由独享守卫,routes.js,brforeEnter:....
+    9.面试题:路由的时候,要说路由导航守卫,聊聊路由导航守卫,用的最多的还是全局前置导航守卫,其次是路由独享守卫
+    10.Trade页面,mounted发送请求获取购物车Order数据
+    11.tip:默认账号才有地址信息
+    12.
+11.Generator的next()??async和await是怎么实现的?
+12.报错通过console.log()可以判断到底在哪里开始出错的
+13.tip:对象解构赋值的同时可以通过:a重命名为a
+14.Trade.vue
+15.拿到熊江老师的面试题记得先敲一遍,敲一遍其义自见,自然背的倒
+16.传参的方式有很多,选择合适的就好,可以总结一下有哪些传参方式
+17.elementUI一般toC用的很少,tob用的比较多
+18.Vue.use相当于全局注册组件
+19.QRCode:二维码
+20.通过reqGetPayInfo的codeUrl生成一个二维码
+21.设置一个循环定时器,不断地查询订单支付状态,可以给一个最大时间,通常来说是30min或者1hour
+22.🍔bug:登录后token和uuid的问题还是存在,难道是没有删除掉?
+  已经解决,是store/modules/shopcart.js的问题
+23.购物车trade&项目总体完成&bugfix&支付验证(花了1分钱)
+  #终端
+  {
+    yarn add qrcode
+  }
+  #api/request.js
+  {
+    request.interceptors.request.use((config) => {
+      const {token} = store.state.user.user;
+      if(token){
+        delete config.headers.userTempId;
+        config.headers.token=token;
+      };
+    });
+  }
+  #api/pay.js
+  {
+    import request from "./request";
+
+    // 1.Center.vue-获取所有订单列表
+    export const reqGetOrderList = (page, limit) =>
+      request({
+        method: "GET",
+        url: `/order/auth/${page}/${limit}`,
+      });
+
+    // 2.Trade.vue-获取当前用户的订单信息
+    export const reqGetOrder = () =>
+      request({
+        method: "GET",
+        url: `/order/auth/trade`,
+      });
+
+    // 3.Trade.vue-提交订单
+    export const reqSubmitOrder = ({
+      tradeNo,
+      consigneeTel,
+      orderDetailList,
+      orderComment,
+      deliveryAddress,
+      paymentWay,
+      consigne,
+    }) => {
+      console.log(tradeNo,
+        consigneeTel,
+        orderDetailList,
+        orderComment,
+        deliveryAddress,
+        paymentWay,
+        consigne);
+      return request({
+        method: "POST",
+        url: `/order/auth/submitOrder`,
+        params: { tradeNo }, // query参数
+        data: {
+          consigne, // 收件人姓名
+          consigneeTel, // 收件人电话
+          deliveryAddress, // 收件地址
+          paymentWay, // 支付方式 (ONLINE代表在线)
+          orderComment, // 订单备注
+          orderDetailList, // 存储多个商品对象的数组
+        },
+      });
+    };
+
+    // 4.Pay.vue获取订单的支付信息
+    export const reqGetPayInfo = (orderId) =>
+      request({
+        method: "GET",
+        url: `/payment/weixin/createNative/${orderId}`, // 支付订单ID (通过提交订单得到)
+      });
+
+    // 5.PaySuccess.vue-查询的支付状态
+    export const reqGetPayStatus = (orderId) =>
+      request({
+        method: "GET",
+        url: `payment/weixin/queryPayStatus/${orderId}`, // 支付订单ID (通过提交订单得到)
+      });
+  }
+  #main.js
+  {
+    import Pagination from '@/components/Pagination'; // 引入自定义的分页器组件
+    Vue.component('Pagination', Pagination); // 注册组件
+  }
+  #package.json
+  {
+    "rules":{
+      "no-trailing-spaces": 0,
+      "import/no-cycle": 0
+    }
+  }
+  #plugins/element.js
+  {
+    import Vue from 'vue';
+    import { Dialog } from 'element-ui';
+
+    Vue.use(Dialog);
+  }
+  #router/index.js
+  {
+    import store from '@/store';
+    const router = new VueRouter({...})
+
+    const authRoute = ["Trade", "Pay", "PaySuccess", "Center"];
+
+    router.beforeEach((to, from, next) => {
+      if (authRoute.indexOf(to.name) === -1 || store.state.user.user.token) {
+        next();
+        return;
+      }
+      next(`/login?redirect=${to.path}`)
+    });
+
+    export default router;
+  }
+  #router/routes.js
+  {
+    export default[
+      {
+        path: "/paysuccess",
+        name: "PaySuccess",
+        component: PaySuccess,
+        // 路由独享守卫[只对某个路由生效]
+        beforeCreate(to, from, next) {
+          // to:去哪里,from:从哪里来,next:必须调用的方法
+          if (from.name === "Pay") { 
+            next();
+            return;
+          }
+          // 如果不是从pay过来的,直接跳转到个人中心[tip:全局路由守卫已经设置用户必须登录才可以访问这些页面]
+          next({ name: 'Center' });
+        },
+      },
+    ]
+  }
+  #store/modules/shopcart.js
+  {
+    export const actions={
+      // 1.获取购物车信息
+        getCartList({ commit }) {
+          return reqGetCartList()
+            .then((cartList) => {
+              
+              if (cartList[0]) {
+                const cartArr = [];
+                cartList.forEach((i) => {
+                  i.cartInfoList.forEach((j) => {
+                    cartArr.push(j);
+                  });
+                });
+                console.log(cartArr);
+                commit('GET_CART_LIST', cartArr);
+              }
+            })
+            .catch((message) => {
+              console.log(message);
+            });
+        },
+    };
+  }
+  #views/Login/Login.vue
+  {
+    <template>
+      <ValidationObserver v-slot="{handleSubmit}">
+        <form @submit.prevent="handleSubmit(onSubmit)">
+          <ValidationProvider>
+            ...
+          </ValidationProvider>
+        </form>
+      </ValidationObserver>
+    </template>
+    <script>
+      export default{
+        methods:{
+          async onSubmit() {
+            try {
+              const { phone, password } = this;
+              // tip:await会将promise的结果值返回,而promise的返回值就是vuex的promise返回的user
+              const user = await this.login({ phone, password });
+              window.localStorage.setItem('user', JSON.stringify(user));
+              // tip:登录的时候判断是否是从其他页面跳转过来的[F4],如果有,跳转回去,如果没有,首页走你
+              const redirect = this.$route.query.redirect || '/';
+              this.$router.history.replace(redirect);
+            } catch (e) {
+              console.log(e);
+            }
+          },
+        }
+      }
+    </script>
+  }
+  #views/ShopCart/ShopCart.vue
+  {
+    <template>
+      <div class="sumbtn">
+        <router-link class="sum-btn" to="/trade">结算</router-link>
+      </div>
+    </template>
+  }
+  #🍟🍟🍟views/Trade/index.vue
+  {
+    <template>
+      <h5 class="receive">收件人信息</h5>
+      <div
+        class="address clearFix"
+        v-for="userAddress in userAddressList"
+        :key="userAddress.id"
+        @click="selectAddress(userAddress.id)"
+        >
+        <span :class="{ username: true, selected: userAddress.isChecked }">{{
+          userAddress.name
+        }}</span>
+        <p>
+          <span class="s1">{{ userAddress.address }}</span>
+          <span class="s2">{{ userAddress.phone }}</span>
+          <span class="s3" v-if="userAddress.isDefault">默认地址</span>
+        </p>
+      </div>
+      .....
+      <h5>商品清单</h5>
+      <ul class="list clearFix" v-for="detail in detailList" :key="detail.id">
+        <li>
+          <img
+            :src="detail.imgUrl"
+            alt="商品图片"
+            :style="{ width: '100px', height: '100px' }"
+          />
+        </li>
+        <li>
+          <p>
+            {{ detail.skuName }}
+          </p>
+          <h4>7天无理由退货</h4>
+        </li>
+        <li>
+          <h3>￥{{ detail.orderPrice }}</h3>
+        </li>
+        <li>X{{ detail.skuNum }}</li>
+        <li>有货</li>
+      </ul>
+      .....
+      <div class="trade">
+        <div class="price">
+          应付金额:<span>¥{{ totalAmount }}</span>
+        </div>
+        <div class="receiveInfo">
+          寄送至:
+          <!-- 通过计算属性得到的实时选择地址 -->
+          <span>{{ address.address }}</span>
+          收货人：<span>{{ address.name }}</span>
+          <span>{{ address.phone }}</span>
+        </div>
+      </div>
+      <div class="sub clearFix">
+        <!-- <router-link class="subBtn" to="/trade">提交订单</router-link> -->
+        <button class="subBtn" @click="submitOrder">提交订单</button>
+      </div>
+    </template>
+    <script>
+      import { reqGetOrder, reqSubmitOrder } from '@/api/pay.js';
+      export default{
+        data() {
+          return {
+            detailList: [], // 商品详情数据
+            totalAmount: 0, // 商品总金额
+            totalNum: 0, // 商品总数量
+            tradeNo: '', // 购物车订单编号
+            userAddressList: [], // 用户收货地址
+            orderComment: '', // 订单备注
+          };
+        },
+        async mounted() {
+          // 1.拿到订单数据
+          const res = await reqGetOrder();
+          // console.log(res);
+          // 2.初始化数据
+          this.detailList = res.detailArrayList; // 商品详情列表
+          this.totalAmount = res.totalAmount;
+          this.totalNum = res.totalNum; // 总数
+          this.tradeNo = res.tradeNo; // 订单编号
+          this.userAddressList = res.userAddressList || [
+            {
+              id: 1, // 编号(用于遍历)
+              name: '沛华', // 收货人
+              address: '草围爱情公寓', // 地址
+              phone: '13800000000', // 电话号码
+              isChecked: true, // 用户选中
+              isDefault: true, // 默认值
+            },
+            {
+              id: 2,
+              name: '静哥',
+              address: '草围单身公寓',
+              phone: '13811111111',
+              isChecked: false,
+              isDefault: false,
+            },
+            {
+              id: 3,
+              name: '雷哥',
+              address: '草围老年公寓',
+              phone: '13822222222',
+              isChecked: false,
+              isDefault: false,
+            },
+          ];
+        },
+        computed: {
+          // COM:当前选中是哪个地址
+          address() {
+            // 找到那个isChecked为true的地址,或者为空(一上来会报错,赋值空以解决)
+            return this.userAddressList.find((address) => address.isChecked) || {};
+          },
+        },
+        methods: {
+          // FN:选择收货地址的函数
+          selectAddress(id) {
+            this.userAddressList.forEach((userAddress) => {
+              // 遍历所有用户地址,判断是当前点选的地址,更改isChecked
+              if (userAddress.id === id) {
+                userAddress.isChecked = true;
+                return;
+              }
+              // 如果不是,改为false
+              userAddress.isChecked = false;
+            });
+          },
+          // FN:🍟🍟🍟提交订单的函数
+          async submitOrder() {
+            // 1.从this中获取数据
+            const {
+              tradeNo, // 订单编号
+              orderComment, // 备注
+              detailList: orderDetailList, // 商品列表
+              totalAmount, // 总价(通过路由传递给pay.vue)
+            } = this;
+            // 2.从计算属性中拿数据(拿到的同时重命名)
+            const {
+              name: consigne, // 收货人
+              phone: consigneeTel, // 收货人电话号码
+              address: deliveryAddress, // 收货人地址
+            } = this.address;
+            // 3.支付方式目前只支持线上
+            const paymentWay = 'ONLINE'; // 目前只支持线上
+            // 4.发送请求,orderId:订单编号(通过路由传递给pay.vue)
+            const orderId = await reqSubmitOrder({
+              tradeNo,
+              orderComment,
+              deliveryAddress,
+              paymentWay,
+              orderDetailList,
+              consigne,
+              consigneeTel,
+            });
+            // 5.请求成功,跳转到pay.vue,路由query携带id和总价
+            this.$router.history.push({
+              name: 'Pay',
+              query: {
+                orderId,
+                totalAmount,
+              },
+            });
+          },
+        },
+      }
+    </script>
+  }
+  #view/Pay/index.js
+  {
+    <template>
+      <div class="paymark">
+        <span class="fl"
+          >请您在提交订单<em class="orange time">4小时</em
+          >之内完成支付，超时订单会自动取消。订单号：<em>{{
+            $route.query.orderId
+          }}</em></span
+        >
+        <span class="fr"
+          ><em class="lead">应付金额：</em
+          ><em class="orange money"
+            >￥{{ $route.query.totalAmount }}</em
+          ></span
+        >
+      </div>
+      .....
+      <div class="hr"></div>
+      <!-- 🍟🍟???,30%宽度,居中 -->
+      <el-dialog :visible.sync="visible" width="30%" center>
+        <div
+          :style="{
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }"
+        >
+          <!-- 图片通过QRCode插件生成 -->
+          <img :src="url" alt="QRCode" />
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button size="small" @click="visible = false"
+            >支付遇到问题</el-button
+          >
+          <el-button size="small" type="primary" @click="visible = false">
+            我已支付成功
+          </el-button>
+        </span>
+      </el-dialog>
+      <div class="submit">
+        <!-- 点击处理获取支付验证码 -->
+        <button class="btn" @click="getQRCode">
+          立即支付
+        </button>
+      </div>
+    </template>
+    <script>
+      import QRCode from 'qrcode'; 
+      import { reqGetPayInfo, reqGetPayStatus } from '@/api/pay.js';
+      export default{
+        data(){
+          return {
+            visible: false,
+            url: '',
+          };
+        },
+        // 组件守卫[如果pay从Trade跳转,不管,否则跳回Center(其实也可以用路由守卫)]
+        beforeRouteEnter(to, from, next) {
+          if (from.name === 'Trade') {
+            next();
+            return;
+          }
+          next({ name: 'Center' });
+        },
+        methods: {
+          // FN:获取二维码,设置图片url,设置
+          async getQRCode() {
+            const res = await reqGetPayInfo(this.$route.query.orderId);
+            // console.log(res); // 改订单需要的支付码等信息
+            /*
+              codeUrl: "weixin://wxpay/bizpayurl?pr=dbS0FPdzz"
+              orderId: 2214
+              resultCode: "SUCCESS"
+              totalFee: 2598
+            */
+            const url = await QRCode.toDataURL(res.codeUrl);
+            this.getOrderStatus(); // 调用FN:获取支付是否成功的函数
+            this.url = url; // 设置二维码图片的地址
+            this.visible = true; // 可以点击弹出框的按钮
+          },
+          // FN:获取支付是否成功的函数(每隔一段事件调用一次,确认支付结果,如果结果成功,跳转到paysuccess)
+          getOrderStatus() {
+            this.timeId = setInterval(async () => {
+              // 支付成功,返回成功的promise
+              // 支付中,会返回失败的promise
+              // async函数特点:成功,向下执行,失败,直接退出async函数,不会向下执行
+              await reqGetPayStatus(this.$route.query.orderId);
+              // 支付成功,清空
+              // clearInterval(this.timeId);
+              this.$router.history.push('/paysuccess');
+            }, 3000);
+          },
+        },
+        beforeDestroy() {
+          clearInterval(this.timeId);
+        },
+      }
+    </script>
+  }
+  #view/Center/index.vue
+  {
+    <template>
+      <div class="orders">
+        <table
+          class="order-item"
+          v-for="order in orderList"
+          :key="order.id"
+        >
+          <thead>
+            <tr>
+              <th colspan="5">
+                <span class="ordertitle"
+                  >{{ order.createTime }} 订单编号：{{
+                    order.outTradeNo
+                  }}</span
+                >
+                <span class="pull-right delete">
+                  <img src="./images/delete.png" />
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(orderDetail, index) in order.orderDetailList"
+              :key="orderDetail.id"
+            >
+              <td width="60%">
+                <div class="typographic">
+                  <img
+                    :style="{ width: '100px', height: '100px' }"
+                    :src="orderDetail.imgUrl"
+                  />
+                  <a class="block-text">{{ orderDetail.skuName }}</a>
+                  <span>x{{ orderDetail.skuNum }}</span>
+                  <a class="service">售后申请</a>
+                </div>
+              </td>
+              <!-- template空标签 -->
+              <template v-if="index === 0">
+                <td rowspan="2" width="8%" class="center">xxx</td>
+                <td rowspan="2" width="13%" class="center">
+                  <ul class="unstyled">
+                    <li>总金额¥{{ order.totalAmount }}</li>
+                    <li>
+                      {{
+                        order.paymentWay === 'ONLINE'
+                          ? '在线支付'
+                          : 'xx支付'
+                      }}
+                    </li>
+                  </ul>
+                </td>
+                <td rowspan="2" width="8%" class="center">
+                  <a class="btn">{{ order.orderStatusName }} </a>
+                </td>
+                <td rowspan="2" width="13%" class="center">
+                  <ul class="unstyled">
+                    <li>
+                      <a href="mycomment.html" target="_blank"
+                        >评价|晒单</a
+                      >
+                    </li>
+                  </ul>
+                </td>
+              </template>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="choose-order">
+        <Pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :page-sizes="[5, 10, 15, 20]"
+          :total="total"
+          :pager-count="7"
+        />
+      </div>
+    </template>
+    <script>
+      import {reqGetOrderList} from '@api/pay.js';
+      export default{
+        data() {
+          return {
+            orderList: [], // 保存订购商品数据
+            currentPage: 1, // 保存当前是第几页
+            pageSize: 5, // 保存每页显示几条数据
+            total: 0, // 保存一共有多少数据
+          };
+        },
+        methods: {
+          // FN:点击切换页码
+          handleSizeChange(pageSize) {
+            this.pageSize = pageSize;
+            this.getOrderList(this.currentPage, pageSize);
+          },
+          // FN:点击改变当前显示第几页
+          handleCurrentChange(currentPage) {
+            this.currentPage = currentPage;
+            this.getOrderList(currentPage, this.pageSize);
+          },
+          // FN:🍟获取orderList
+          async getOrderList(currentPage, pageSize) {
+            const response = await reqGetOrderList(currentPage, pageSize);
+            this.orderList = response.records;
+            this.total = response.total;
+          },
+        },
+        mounted() {
+          // 1.结构需要的参数
+          const { currentPage, pageSize } = this;
+          // 2.调用🍟获取orderList函数(FN来自methods)
+          this.getOrderList(currentPage, pageSize);
+        },
+      }
+    </script>
+  }
+24.

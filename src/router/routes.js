@@ -1,14 +1,14 @@
-import Home from '@/views/Home/Home.vue';
-import Search from '@/views/Search/Search.vue';
-import Register from '@/views/Register/Register.vue';
-import Login from '@/views/Login/Login.vue';
-import Detail from '@/views/Detail/Detail.vue';
-import AddCartSuccess from '@/views/AddCartSuccess/AddCartSuccess.vue';
-import ShopCart from '@/views/ShopCart/ShopCart.vue';
-import Trade from "@/views/Trade";
-import Pay from "@/views/Pay";
-import PaySuccess from "@/views/PaySuccess";
-import Center from "@/views/Center";
+import Home from '@/views/Home/Home.vue'; // 首页
+import Search from '@/views/Search/Search.vue'; // 搜索结果页面
+import Register from '@/views/Register/Register.vue'; // 注册
+import Login from '@/views/Login/Login.vue'; // 登录
+import Detail from '@/views/Detail/Detail.vue'; // 商品详情
+import AddCartSuccess from '@/views/AddCartSuccess/AddCartSuccess.vue'; // 加入购物车成功
+import ShopCart from '@/views/ShopCart/ShopCart.vue'; // 购物车
+import Trade from "@/views/Trade"; // 确认订单页面
+import Pay from "@/views/Pay"; // 支付页面
+import PaySuccess from "@/views/PaySuccess"; // 支付成功页面
+import Center from "@/views/Center"; // 个人中心页面
 
 export default [
   {
@@ -71,6 +71,16 @@ export default [
     path: "/paysuccess",
     name: "PaySuccess",
     component: PaySuccess,
+    // 路由独享守卫[只对某个路由生效]
+    beforeCreate(to, from, next) {
+      // to:去哪里,from:从哪里来,next:必须调用的方法
+      if (from.name === "Pay") { // 如果是从Pay跳转到PaySuccess,不操作,直接next()
+        next();
+        return;
+      }
+      // 反之,直接跳转到个人中心[tip:全局路由守卫已经设置用户必须登录才可以访问这些页面]
+      next({ name: 'Center' });
+    },
   },
   {
     path: "/center",
