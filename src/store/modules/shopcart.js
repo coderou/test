@@ -35,6 +35,14 @@ export const actions = {
     return reqGetCartList()
       .then((cartList) => {
         console.log(cartList);
+        // 章驰代码(有bug)
+        /* const cartArr = cartList[0].cartInfoList;
+        if (cartList[1]) {
+          cartList[1].cartInfoList.forEach((cart) => {
+            cartArr.push(cart);
+          });
+        }
+        commit('GET_CART_LIST', cartArr); */
         // coderou代码
         if (cartList[0]) {
           const cartArr = [];
