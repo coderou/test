@@ -4,8 +4,8 @@
   <div
     ref="swiper"
     class="swiper-container"
-    @mouseenter="swiper.autoplay.stop()"
-    @mouseleave="swiper.autoplay.start()"
+    @mouseenter="stop"
+    @mouseleave="start"
   >
     <div class="swiper-wrapper">
       <div v-for="image in carouselList" :key="image.id" class="swiper-slide">
@@ -106,6 +106,14 @@ export default {
     /*  方法2:
     if(空数组):过滤
     new Swiper() */
+  },
+  methods: {
+    stop() {
+      if (this.swiper) { this.swiper.autoplay.stop(); }
+    },
+    start() {
+      if (this.swiper) { this.swiper.autoplay.start(); }
+    },
   },
 };
 </script>

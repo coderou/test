@@ -11,7 +11,7 @@
         <div class="cart-th6">操作</div>
       </div>
       <div class="cart-body">
-        <!--
+        <!--数据结构:
           cartPrice:4188
           couponInfoList:null
           createTime:"2021-03-15 16:54:42"
@@ -55,7 +55,7 @@
             <input
               autocomplete="off"
               type="text"
-              value="1"
+              :value="cart.skuNum"
               minnum="1"
               class="itxt"
             />
@@ -102,7 +102,7 @@
           <i class="summoney">{{ totalPrice }}</i>
         </div>
         <div class="sumbtn">
-          <a class="sum-btn" href="###" target="_blank">结算</a>
+          <router-link class="sum-btn" to="/pay" >结算</router-link>
         </div>
       </div>
     </div>

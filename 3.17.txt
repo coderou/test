@@ -108,9 +108,39 @@
   }
   #views/ShopCart/ShopCart.vue
   {
+    <input :value="cart.skuNum"  />
     <span class="sum">{{ cart.skuNum * cart.skuPrice }}</span>
   }
-  #🤣🤣api/pay.js
+  #router/routes.js
+  {
+    import Trade from "@/views/Trade";
+    import Pay from "@/views/Pay";
+    import PaySuccess from "@/views/PaySuccess";
+    import Center from "@/views/Center";
+    export default{
+      {
+        path: "/trade",
+        name: "Trade",
+        component: Trade,
+      },
+      {
+        path: "/pay",
+        name: "Pay",
+        component: Pay,
+      },
+      {
+        path: "/paysuccess",
+        name: "PaySuccess",
+        component: PaySuccess,
+      },
+      {
+        path: "/center",
+        name: "Center",
+        component: Center,
+      },
+    }
+  }
+  #🤣🤣api/pay.js(cv的,没自己写)
   {
     import request from "./request";
     // 1.获取所有订单列表

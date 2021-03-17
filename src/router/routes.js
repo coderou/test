@@ -5,6 +5,10 @@ import Login from '@/views/Login/Login.vue';
 import Detail from '@/views/Detail/Detail.vue';
 import AddCartSuccess from '@/views/AddCartSuccess/AddCartSuccess.vue';
 import ShopCart from '@/views/ShopCart/ShopCart.vue';
+import Trade from "@/views/Trade";
+import Pay from "@/views/Pay";
+import PaySuccess from "@/views/PaySuccess";
+import Center from "@/views/Center";
 
 export default [
   {
@@ -52,5 +56,25 @@ export default [
     path: '/shopcart',
     name: 'ShopCart',
     component: ShopCart,
+  },
+  {
+    path: "/trade",
+    name: "Trade",
+    component: Trade,
+  },
+  {
+    path: "/pay",
+    name: "Pay",
+    component: Pay,
+  },
+  {
+    path: "/paysuccess",
+    name: "PaySuccess",
+    component: PaySuccess,
+  },
+  {
+    path: "/center",
+    name: "Center",
+    component: Center,
   },
 ];
