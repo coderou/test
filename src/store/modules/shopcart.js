@@ -44,12 +44,21 @@ export const actions = {
         }
         commit('GET_CART_LIST', cartArr); */
         // coderou代码
-        if (cartList[0]) {
+        /* if (cartList[0]) {
           const cartArr = [];
           cartList.forEach((i) => {
             i.cartInfoList.forEach((j) => {
               cartArr.push(j);
             });
+          });
+          console.log(cartArr);
+          commit('GET_CART_LIST', cartArr);
+        } */
+        // coderou代码2.0
+        if (cartList[0]) {
+          let cartArr = [];
+          cartList.forEach((i) => {
+            cartArr = [...cartArr, ...i.cartInfoList];
           });
           console.log(cartArr);
           commit('GET_CART_LIST', cartArr);
