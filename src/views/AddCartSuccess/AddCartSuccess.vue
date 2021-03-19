@@ -5,7 +5,7 @@
       <div class="goods">
         <div class="left-good">
           <div class="left-pic">
-            <img :src="cart.skuDefaultImg" />
+            <img v-lazy="cart.skuDefaultImg" />
           </div>
           <div class="right-info">
             <p class="title">

@@ -1,13 +1,13 @@
 <template>
   <div class="spec-preview">
-    <!-- <img :src="skuImageList[0].imgUrl" /> -->
-    <img :src="imgUrl" />
+    <!-- <img v-lazy="skuImageList[0].imgUrl" /> -->
+    <img v-lazy="imgUrl" />
     <div ref="event" class="event" @mousemove="zoom"></div>
     <div ref="mask" class="mask"></div>
 
     <div class="big">
-      <!-- <img ref="bigImg" :src="skuImageList[0].imgUrl" /> -->
-      <img ref="bigImg" :src="bigUrl" />
+      <!-- <img ref="bigImg" v-lazy="skuImageList[0].imgUrl" /> -->
+      <img ref="bigImg" v-lazy="bigUrl" />
     </div>
   </div>
 </template>

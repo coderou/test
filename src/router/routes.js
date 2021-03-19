@@ -1,14 +1,26 @@
-import Home from '@/views/Home/Home.vue'; // 首页
-import Search from '@/views/Search/Search.vue'; // 搜索结果页面
-import Register from '@/views/Register/Register.vue'; // 注册
-import Login from '@/views/Login/Login.vue'; // 登录
-import Detail from '@/views/Detail/Detail.vue'; // 商品详情
-import AddCartSuccess from '@/views/AddCartSuccess/AddCartSuccess.vue'; // 加入购物车成功
-import ShopCart from '@/views/ShopCart/ShopCart.vue'; // 购物车
-import Trade from "@/views/Trade"; // 确认订单页面
-import Pay from "@/views/Pay"; // 支付页面
-import PaySuccess from "@/views/PaySuccess"; // 支付成功页面
-import Center from "@/views/Center"; // 个人中心页面
+// 懒加载:const Login = () => import("@/views/Login/Login.vue");
+// import Home from '@/views/Home/Home.vue'; // 首页
+// import Search from '@/views/Search/Search.vue'; // 搜索结果页面
+// import Register from '@/views/Register/Register.vue'; // 注册
+// import Login from '@/views/Login/Login.vue'; // 登录
+// import Detail from '@/views/Detail/Detail.vue'; // 商品详情
+// import AddCartSuccess from '@/views/AddCartSuccess/AddCartSuccess.vue'; // 加入购物车成功
+// import ShopCart from '@/views/ShopCart/ShopCart.vue'; // 购物车
+// import Trade from "@/views/Trade"; // 确认订单页面
+// import Pay from "@/views/Pay"; // 支付页面
+// import PaySuccess from "@/views/PaySuccess"; // 支付成功页面
+// import Center from "@/views/Center"; // 个人中心页面
+const Home = () => import(/* webpackChunkName:"Home" */'@/views/Home/Home.vue');
+const Search = () => import(/* webpackChunkName:"Search" */'@/views/Search/Search.vue');
+const Register = () => import(/* webpackChunkName:"Register" */'@/views/Register/Register.vue');
+const Login = () => import(/* webpackChunkName:"Login" */'@/views/Login/Login.vue');
+const Detail = () => import(/* webpackChunkName:"Detail" */'@/views/Detail/Detail.vue');
+const AddCartSuccess = () => import(/* webpackChunkName:"AddCartSuccess" */'@/views/AddCartSuccess/AddCartSuccess.vue');
+const ShopCart = () => import(/* webpackChunkName:"ShopCart" */'@/views/ShopCart/ShopCart.vue');
+const Trade = () => import(/* webpackChunkName:"Trade" */'@/views/Trade');
+const Pay = () => import(/* webpackChunkName:"Pay" */'@/views/Pay');
+const PaySuccess = () => import(/* webpackChunkName:"PaySuccess" */'@/views/PaySuccess');
+const Center = () => import(/* webpackChunkName:"Center" */'@/views/Center');
 
 export default [
   {

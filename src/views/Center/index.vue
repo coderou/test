@@ -177,7 +177,7 @@
                       <div class="typographic">
                         <img
                           :style="{ width: '100px', height: '100px' }"
-                          :src="orderDetail.imgUrl"
+                          v-lazy="orderDetail.imgUrl"
                         />
                         <a class="block-text">{{ orderDetail.skuName }}</a>
                         <span>x{{ orderDetail.skuNum }}</span>

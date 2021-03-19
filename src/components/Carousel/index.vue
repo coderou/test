@@ -8,8 +8,17 @@
     @mouseleave="start"
   >
     <div class="swiper-wrapper">
-      <div v-for="image in carouselList" :key="image.id" class="swiper-slide">
-        <img :src="image.imgUrl" :alt="image.title" />
+      <div
+        v-for="(image, index) in carouselList"
+        :key="image.id"
+        class="swiper-slide"
+      >
+        <img
+          v-if="index === 0 || index === carouselList.length"
+          :src="image.imgUrl"
+          :alt="image.title"
+        />
+        <img v-else v-lazy="image.imgUrl" :alt="image.title" />
       </div>
     </div>
     <!-- Add Arrows -->
@@ -109,10 +118,14 @@ export default {
   },
   methods: {
     stop() {
-      if (this.swiper) { this.swiper.autoplay.stop(); }
+      if (this.swiper) {
+        this.swiper.autoplay.stop();
+      }
     },
     start() {
-      if (this.swiper) { this.swiper.autoplay.start(); }
+      if (this.swiper) {
+        this.swiper.autoplay.start();
+      }
     },
   },
 };

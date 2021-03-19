@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueLazyload from 'vue-lazyload';
 import { ValidationObserver, ValidationProvider } from 'vee-validate';
 // import Carousel from './components/Carousel/index.vue';
 import Carousel from '@/components/Carousel';
@@ -12,6 +13,14 @@ import '@/assets/css/reset.css';
 import '@/assets/font/iconfont.css';
 import './plugins/element.js';
 
+// 安装插件
+Vue.use(VueLazyload, {
+  preload: 1.3, // 需要加载资源的高度(1.3个视口高度)
+  // error: './assets/images/lazyload.gif', // tip:main.js这样写不会打包的
+  error: require('./assets/images/lazyload.gif'),
+  loading: './assets/images/lazyload.gif',
+  attempt: 1, // 视图加载图片的次数
+});
 // 加载mock,让其生效
 /* eslint-disable */
 if (process.env.NODE_ENV === 'development') {

@@ -87,7 +87,7 @@
             }"
           >
             <!-- 图片通过QRCode插件生成 -->
-            <img :src="url" alt="QRCode" />
+            <img v-lazy="url" alt="QRCode" />
           </div>
           <span slot="footer" class="dialog-footer">
             <el-button size="small" @click="visible = false"

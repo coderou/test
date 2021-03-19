@@ -94,7 +94,7 @@
                   <div class="p-img">
                     <!-- :to="{path:'/Detail/',params:{skuId:goods.id},}" -->
                     <router-link :to="`/detail/${goods.id}`"
-                      ><img :src="goods.defaultImg"
+                      ><img v-lazy="goods.defaultImg"
                     /></router-link>
                   </div>
                   <div class="price">

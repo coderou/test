@@ -480,7 +480,7 @@
       <ul class="list clearFix" v-for="detail in detailList" :key="detail.id">
         <li>
           <img
-            :src="detail.imgUrl"
+            v-lazy="detail.imgUrl"
             alt="商品图片"
             :style="{ width: '100px', height: '100px' }"
           />
@@ -654,7 +654,7 @@
           }"
         >
           <!-- 图片通过QRCode插件生成 -->
-          <img :src="url" alt="QRCode" />
+          <img v-lazy="url" alt="QRCode" />
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button size="small" @click="visible = false"
@@ -757,7 +757,7 @@
                 <div class="typographic">
                   <img
                     :style="{ width: '100px', height: '100px' }"
-                    :src="orderDetail.imgUrl"
+                    v-lazy="orderDetail.imgUrl"
                   />
                   <a class="block-text">{{ orderDetail.skuName }}</a>
                   <span>x{{ orderDetail.skuNum }}</span>

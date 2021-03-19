@@ -38,7 +38,7 @@
         <ul class="list clearFix" v-for="detail in detailList" :key="detail.id">
           <li>
             <img
-              :src="detail.imgUrl"
+              v-lazy="detail.imgUrl"
               alt="商品图片"
               :style="{ width: '100px', height: '100px' }"
             />

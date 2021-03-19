@@ -8,7 +8,7 @@
       >
         <img
           :class="{ active: currentIndex === index }"
-          :src="img.imgUrl"
+          v-lazy="img.imgUrl"
           :alt="img.imgName"
           @click="setCurrentIndex(index)"
         />
